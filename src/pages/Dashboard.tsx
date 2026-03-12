@@ -2,6 +2,7 @@ import { SummaryCards } from '@/components/SummaryCards';
 import { CategoryPieChart, MonthlyBarChart } from '@/components/Charts';
 import { ExpenseTable } from '@/components/ExpenseTable';
 import { MemberSpending } from '@/components/MemberSpending';
+import { IncomeManager } from '@/components/IncomeManager';
 
 const Dashboard = () => {
   return (
