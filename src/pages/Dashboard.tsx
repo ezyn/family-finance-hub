@@ -2,6 +2,7 @@ import { SummaryCards } from '@/components/SummaryCards';
 import { CategoryPieChart, MonthlyBarChart } from '@/components/Charts';
 import { ExpenseTable } from '@/components/ExpenseTable';
 import { MemberSpending } from '@/components/MemberSpending';
+import { IncomeManager } from '@/components/IncomeManager';
 
 const Dashboard = () => {
   return (
@@ -19,7 +20,10 @@ const Dashboard = () => {
         <div className="lg:col-span-2">
           <ExpenseTable />
         </div>
-        <MemberSpending />
+        <div className="space-y-6">
+          <IncomeManager />
+          <MemberSpending />
+        </div>
       </div>
     </div>
   );
