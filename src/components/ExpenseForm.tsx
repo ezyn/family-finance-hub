@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import type { Expense } from '@/lib/types';
+import { PAYMENT_METHODS, type Expense, type PaymentMethod } from '@/lib/types';
 
 interface Props {
   expense?: Expense;
@@ -23,6 +23,7 @@ export function ExpenseForm({ expense, onClose, trigger }: Props) {
     name: expense?.name || '',
     amount: expense?.amount?.toString() || '',
     category: expense?.category || '',
+    paymentMethod: expense?.paymentMethod || '' as PaymentMethod | '',
     date: expense?.date || new Date().toISOString().slice(0, 10),
     memberId: expense?.memberId || '',
     note: expense?.note || '',
@@ -30,11 +31,11 @@ export function ExpenseForm({ expense, onClose, trigger }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.amount || !form.category || !form.memberId) {
+    if (!form.name || !form.amount || !form.category || !form.memberId || !form.paymentMethod) {
       toast.error('Preencha todos os campos obrigatórios');
       return;
     }
-    const data = { ...form, amount: parseFloat(form.amount) };
+    const data = { ...form, amount: parseFloat(form.amount), paymentMethod: form.paymentMethod as PaymentMethod };
     if (expense) {
       updateExpense({ ...data, id: expense.id });
       toast.success('Despesa atualizada!');
@@ -42,7 +43,7 @@ export function ExpenseForm({ expense, onClose, trigger }: Props) {
       addExpense(data);
       toast.success('Despesa registrada!');
     }
-    setForm({ name: '', amount: '', category: '', date: new Date().toISOString().slice(0, 10), memberId: '', note: '' });
+    setForm({ name: '', amount: '', category: '', paymentMethod: '', date: new Date().toISOString().slice(0, 10), memberId: '', note: '' });
     setOpen(false);
     onClose?.();
   };
@@ -81,6 +82,15 @@ export function ExpenseForm({ expense, onClose, trigger }: Props) {
               <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
               <SelectContent>
                 {categories.map(c => <SelectItem key={c.id} value={c.id}>{c.name}</SelectItem>)}
+              </SelectContent>
+            </Select>
+          </div>
+          <div>
+            <Label>Forma de Pagamento *</Label>
+            <Select value={form.paymentMethod} onValueChange={(v: PaymentMethod) => setForm(f => ({ ...f, paymentMethod: v }))}>
+              <SelectTrigger><SelectValue placeholder="Selecione" /></SelectTrigger>
+              <SelectContent>
+                {PAYMENT_METHODS.map(p => <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
