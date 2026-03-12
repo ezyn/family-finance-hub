@@ -23,6 +23,7 @@ export function ExpenseForm({ expense, onClose, trigger }: Props) {
     name: expense?.name || '',
     amount: expense?.amount?.toString() || '',
     category: expense?.category || '',
+    paymentMethod: expense?.paymentMethod || '' as PaymentMethod | '',
     date: expense?.date || new Date().toISOString().slice(0, 10),
     memberId: expense?.memberId || '',
     note: expense?.note || '',
