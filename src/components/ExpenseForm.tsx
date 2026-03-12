@@ -93,6 +93,7 @@ export function ExpenseForm({ expense, onClose, trigger }: Props) {
                 {PAYMENT_METHODS.map(p => <SelectItem key={p.value} value={p.value}>{p.label}</SelectItem>)}
               </SelectContent>
             </Select>
+          </div>
           <div>
             <Label>Quem gastou *</Label>
             <Select value={form.memberId} onValueChange={v => setForm(f => ({ ...f, memberId: v }))}>
