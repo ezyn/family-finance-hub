@@ -8,7 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus } from 'lucide-react';
 import { toast } from 'sonner';
-import type { Expense } from '@/lib/types';
+import { PAYMENT_METHODS, type Expense, type PaymentMethod } from '@/lib/types';
 
 interface Props {
   expense?: Expense;
