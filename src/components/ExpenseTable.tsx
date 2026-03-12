@@ -30,6 +30,7 @@ export function ExpenseTable() {
 
   const getMemberName = (id: string) => members.find(m => m.id === id)?.name || 'Desconhecido';
   const getCategoryName = (id: string) => categories.find(c => c.id === id)?.name || id;
+  const getPaymentLabel = (v: string) => PAYMENT_METHODS.find(p => p.value === v)?.label || v;
 
   const exportCSV = () => {
     const header = 'Nome,Valor,Categoria,Data,Membro,Observação\n';
