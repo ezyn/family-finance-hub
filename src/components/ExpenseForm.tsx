@@ -31,11 +31,11 @@ export function ExpenseForm({ expense, onClose, trigger }: Props) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!form.name || !form.amount || !form.category || !form.memberId) {
+    if (!form.name || !form.amount || !form.category || !form.memberId || !form.paymentMethod) {
       toast.error('Preencha todos os campos obrigatórios');
       return;
     }
-    const data = { ...form, amount: parseFloat(form.amount) };
+    const data = { ...form, amount: parseFloat(form.amount), paymentMethod: form.paymentMethod as PaymentMethod };
     if (expense) {
       updateExpense({ ...data, id: expense.id });
       toast.success('Despesa atualizada!');
@@ -43,7 +43,7 @@ export function ExpenseForm({ expense, onClose, trigger }: Props) {
       addExpense(data);
       toast.success('Despesa registrada!');
     }
-    setForm({ name: '', amount: '', category: '', date: new Date().toISOString().slice(0, 10), memberId: '', note: '' });
+    setForm({ name: '', amount: '', category: '', paymentMethod: '', date: new Date().toISOString().slice(0, 10), memberId: '', note: '' });
     setOpen(false);
     onClose?.();
   };
