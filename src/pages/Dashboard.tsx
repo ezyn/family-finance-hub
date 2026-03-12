@@ -20,7 +20,10 @@ const Dashboard = () => {
         <div className="lg:col-span-2">
           <ExpenseTable />
         </div>
-        <MemberSpending />
+        <div className="space-y-6">
+          <IncomeManager />
+          <MemberSpending />
+        </div>
       </div>
     </div>
   );
