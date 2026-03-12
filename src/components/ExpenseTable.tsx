@@ -100,6 +100,7 @@ export function ExpenseTable() {
                   <TableCell className="font-medium">{e.name}</TableCell>
                   <TableCell>R$ {e.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
                   <TableCell className="hidden sm:table-cell">{getCategoryName(e.category)}</TableCell>
+                  <TableCell className="hidden sm:table-cell">{getPaymentLabel(e.paymentMethod || '')}</TableCell>
                   <TableCell className="hidden sm:table-cell">{format(new Date(e.date), 'dd/MM/yyyy', { locale: ptBR })}</TableCell>
                   <TableCell className="hidden md:table-cell">{getMemberName(e.memberId)}</TableCell>
                   <TableCell>
