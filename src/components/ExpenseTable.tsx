@@ -94,7 +94,7 @@ export function ExpenseTable() {
             </TableHeader>
             <TableBody>
               {filtered.length === 0 ? (
-                <TableRow><TableCell colSpan={6} className="text-center text-muted-foreground py-8">Nenhuma despesa encontrada</TableCell></TableRow>
+                <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhuma despesa encontrada</TableCell></TableRow>
               ) : filtered.map(e => (
                 <TableRow key={e.id}>
                   <TableCell className="font-medium">{e.name}</TableCell>
