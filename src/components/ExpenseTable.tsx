@@ -33,9 +33,9 @@ export function ExpenseTable() {
   const getPaymentLabel = (v: string) => PAYMENT_METHODS.find(p => p.value === v)?.label || v;
 
   const exportCSV = () => {
-    const header = 'Nome,Valor,Categoria,Data,Membro,Observação\n';
+    const header = 'Nome,Valor,Categoria,Pagamento,Data,Membro,Observação\n';
     const rows = filtered.map(e =>
-      `"${e.name}",${e.amount},"${getCategoryName(e.category)}","${e.date}","${getMemberName(e.memberId)}","${e.note || ''}"`
+      `"${e.name}",${e.amount},"${getCategoryName(e.category)}","${getPaymentLabel(e.paymentMethod || '')}","${e.date}","${getMemberName(e.memberId)}","${e.note || ''}"`
     ).join('\n');
     const blob = new Blob([header + rows], { type: 'text/csv;charset=utf-8;' });
     const url = URL.createObjectURL(blob);
