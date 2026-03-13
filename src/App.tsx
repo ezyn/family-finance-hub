@@ -27,7 +27,7 @@ const App = () => (
                 <header className="h-14 flex items-center justify-between border-b bg-card/80 backdrop-blur-sm px-4">
                   <div className="flex items-center">
                     <SidebarTrigger />
-                    <h2 className="ml-3 text-sm font-medium text-muted-foreground" style={{ fontFamily: 'var(--font-heading)' }}>
+                    <h2 className="ml-3 text-sm font-bold text-muted-foreground" style={{ fontFamily: "'Nunito', sans-serif" }}>
                       Family Finance Dashboard
                     </h2>
                   </div>
