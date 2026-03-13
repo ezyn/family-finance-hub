@@ -14,7 +14,102 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      categories: {
+        Row: {
+          created_at: string
+          icon: string | null
+          id: string
+          name: string
+        }
+        Insert: {
+          created_at?: string
+          icon?: string | null
+          id: string
+          name: string
+        }
+        Update: {
+          created_at?: string
+          icon?: string | null
+          id?: string
+          name?: string
+        }
+        Relationships: []
+      }
+      expenses: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          date: string
+          id: string
+          member_id: string
+          name: string
+          note: string | null
+          payment_method: string
+        }
+        Insert: {
+          amount: number
+          category: string
+          created_at?: string
+          date?: string
+          id?: string
+          member_id: string
+          name: string
+          note?: string | null
+          payment_method: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          date?: string
+          id?: string
+          member_id?: string
+          name?: string
+          note?: string | null
+          payment_method?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "expenses_category_fkey"
+            columns: ["category"]
+            isOneToOne: false
+            referencedRelation: "categories"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "expenses_member_id_fkey"
+            columns: ["member_id"]
+            isOneToOne: false
+            referencedRelation: "family_members"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      family_members: {
+        Row: {
+          avatar: string | null
+          created_at: string
+          id: string
+          income: number
+          name: string
+        }
+        Insert: {
+          avatar?: string | null
+          created_at?: string
+          id?: string
+          income?: number
+          name: string
+        }
+        Update: {
+          avatar?: string | null
+          created_at?: string
+          id?: string
+          income?: number
+          name?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never
