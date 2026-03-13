@@ -4,6 +4,7 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "@/components/AppSidebar";
+import { ThemeToggle } from "@/components/ThemeToggle";
 import { FinanceProvider } from "@/lib/finance-context";
 import Dashboard from "./pages/Dashboard";
 import Expenses from "./pages/Expenses";
@@ -20,14 +21,17 @@ const App = () => (
       <FinanceProvider>
         <BrowserRouter>
           <SidebarProvider>
-            <div className="min-h-screen flex w-full">
+            <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-background to-background dark:from-[hsl(270,40%,8%)] dark:via-[hsl(275,35%,12%)] dark:to-[hsl(265,30%,10%)]">
               <AppSidebar />
               <div className="flex-1 flex flex-col">
-                <header className="h-14 flex items-center border-b bg-card px-4">
-                  <SidebarTrigger />
-                  <h2 className="ml-3 text-sm font-medium text-muted-foreground" style={{ fontFamily: 'var(--font-heading)' }}>
-                    Family Finance Dashboard
-                  </h2>
+                <header className="h-14 flex items-center justify-between border-b bg-card/80 backdrop-blur-sm px-4">
+                  <div className="flex items-center">
+                    <SidebarTrigger />
+                    <h2 className="ml-3 text-sm font-medium text-muted-foreground" style={{ fontFamily: 'var(--font-heading)' }}>
+                      Family Finance Dashboard
+                    </h2>
+                  </div>
+                  <ThemeToggle />
                 </header>
                 <main className="flex-1 p-4 md:p-6 overflow-auto">
                   <Routes>
