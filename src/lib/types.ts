@@ -5,12 +5,13 @@ export interface FamilyMember {
   income: number;
 }
 
-export type PaymentMethod = 'credito' | 'debito' | 'pix';
+export type PaymentMethod = 'credito' | 'debito' | 'pix' | 'alimentacao';
 
 export const PAYMENT_METHODS: { value: PaymentMethod; label: string }[] = [
   { value: 'credito', label: 'Cartão de Crédito' },
   { value: 'debito', label: 'Débito' },
   { value: 'pix', label: 'Pix' },
+  { value: 'alimentacao', label: 'Alimentação' },
 ];
 
 export interface Expense {
