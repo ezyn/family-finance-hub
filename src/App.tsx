@@ -31,7 +31,7 @@ function AuthenticatedApp() {
               <div className="flex items-center">
                 <SidebarTrigger />
                 <h2 className="ml-3 text-sm font-bold text-primary" style={{ fontFamily: "'Nunito', sans-serif" }}>
-                  Family Finance Dashboard
+                  Family Finance WS
                 </h2>
               </div>
               <div className="flex items-center gap-2">

@@ -29,7 +29,7 @@ export function AppSidebar() {
           <div className="h-8 w-8 rounded-lg bg-sidebar-primary flex items-center justify-center">
             <Wallet className="h-4 w-4 text-sidebar-primary-foreground" />
           </div>
-          {!collapsed && <span className="font-extrabold text-sm text-sidebar-primary" style={{ fontFamily: "'Nunito', sans-serif" }}>Family Finance</span>}
+          {!collapsed && <span className="font-extrabold text-sm text-sidebar-primary" style={{ fontFamily: "'Nunito', sans-serif" }}>Family Finance WS</span>}
         </div>
         <SidebarGroup>
           <SidebarGroupContent>
