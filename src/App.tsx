@@ -48,6 +48,7 @@ function AuthenticatedApp() {
                 <Route path="/despesas" element={<Expenses />} />
                 <Route path="/membros" element={<Members />} />
                 <Route path="/configuracoes" element={<Settings />} />
+                <Route path="/auth" element={<Navigate to="/" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
