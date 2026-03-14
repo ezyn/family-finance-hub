@@ -55,7 +55,7 @@ export default function Auth() {
             <Wallet className="h-6 w-6 text-primary-foreground" />
           </div>
           <CardTitle className="text-2xl font-bold" style={{ fontFamily: "'Nunito', sans-serif" }}>
-            Family Finance
+            Family Finance WS
           </CardTitle>
           <CardDescription>
             {isLogin ? 'Entre na sua conta' : 'Crie sua conta'}
