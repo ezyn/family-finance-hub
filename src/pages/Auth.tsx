@@ -5,7 +5,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Wallet } from 'lucide-react';
 import { toast } from 'sonner';
 
 export default function Auth() {
@@ -51,8 +50,8 @@ export default function Auth() {
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-3">
-          <div className="mx-auto h-12 w-12 rounded-xl bg-primary flex items-center justify-center">
-            <Wallet className="h-6 w-6 text-primary-foreground" />
+          <div className="mx-auto h-12 w-12 rounded-xl flex items-center justify-center">
+            <img src="/favicon.ico" alt="Family Finance WS" className="h-10 w-10" />
           </div>
           <CardTitle className="text-2xl font-bold" style={{ fontFamily: "'Nunito', sans-serif" }}>
             Family Finance WS
