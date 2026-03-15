@@ -2,6 +2,7 @@ import React, { createContext, useContext, useState, useEffect, useCallback } fr
 import { supabase } from '@/integrations/supabase/client';
 import { Expense, FamilyMember, Category, DEFAULT_CATEGORIES } from './types';
 import type { PaymentMethod } from './types';
+import { useAuth } from '@/hooks/useAuth';
 
 interface FinanceContextType {
   expenses: Expense[];
@@ -11,7 +12,7 @@ interface FinanceContextType {
   addExpense: (e: Omit<Expense, 'id'>) => void;
   updateExpense: (e: Expense) => void;
   deleteExpense: (id: string) => void;
-  addMember: (m: Omit<FamilyMember, 'id'>) => void;
+  addMember: (m: Omit<FamilyMember, 'id' | 'ownerId'>) => void;
   updateMember: (m: FamilyMember) => void;
   deleteMember: (id: string) => void;
   addCategory: (name: string) => void;
@@ -21,13 +22,14 @@ interface FinanceContextType {
 const FinanceContext = createContext<FinanceContextType | null>(null);
 
 export function FinanceProvider({ children }: { children: React.ReactNode }) {
+  const { user } = useAuth();
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [members, setMembers] = useState<FamilyMember[]>([]);
   const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [loading, setLoading] = useState(true);
 
-  // Fetch all data on mount
   useEffect(() => {
+    if (!user) return;
     const fetchAll = async () => {
       setLoading(true);
       const [expRes, memRes, catRes] = await Promise.all([
@@ -41,7 +43,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setLoading(false);
     };
     fetchAll();
-  }, []);
+  }, [user]);
 
   const addExpense = useCallback(async (e: Omit<Expense, 'id'>) => {
     const { data, error } = await supabase.from('expenses').insert({
@@ -74,18 +76,22 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     if (!error) setExpenses(prev => prev.filter(x => x.id !== id));
   }, []);
 
-  const addMember = useCallback(async (m: Omit<FamilyMember, 'id'>) => {
+  const addMember = useCallback(async (m: Omit<FamilyMember, 'id' | 'ownerId'>) => {
+    if (!user) return;
     const { data, error } = await supabase.from('family_members').insert({
       name: m.name,
+      email: m.email,
       avatar: m.avatar || null,
       income: m.income,
+      owner_id: user.id,
     }).select().single();
     if (data && !error) setMembers(prev => [...prev, mapMember(data)]);
-  }, []);
+  }, [user]);
 
   const updateMember = useCallback(async (m: FamilyMember) => {
     const { data, error } = await supabase.from('family_members').update({
       name: m.name,
+      email: m.email,
       avatar: m.avatar || null,
       income: m.income,
     }).eq('id', m.id).select().single();
@@ -126,7 +132,6 @@ export function useFinance() {
   return ctx;
 }
 
-// Map DB row to app types
 function mapExpense(row: any): Expense {
   return {
     id: row.id,
@@ -144,7 +149,9 @@ function mapMember(row: any): FamilyMember {
   return {
     id: row.id,
     name: row.name,
+    email: row.email || '',
     avatar: row.avatar || undefined,
     income: Number(row.income),
+    ownerId: row.owner_id,
   };
 }

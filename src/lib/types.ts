@@ -1,8 +1,10 @@
 export interface FamilyMember {
   id: string;
   name: string;
+  email: string;
   avatar?: string;
   income: number;
+  ownerId?: string;
 }
 
 export type PaymentMethod = 'credito' | 'debito' | 'pix' | 'alimentacao';
