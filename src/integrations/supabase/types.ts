@@ -90,23 +90,29 @@ export type Database = {
         Row: {
           avatar: string | null
           created_at: string
+          email: string | null
           id: string
           income: number
           name: string
+          owner_id: string | null
         }
         Insert: {
           avatar?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           income?: number
           name: string
+          owner_id?: string | null
         }
         Update: {
           avatar?: string | null
           created_at?: string
+          email?: string | null
           id?: string
           income?: number
           name?: string
+          owner_id?: string | null
         }
         Relationships: []
       }
@@ -139,7 +145,7 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      get_user_household_ids: { Args: { _user_id: string }; Returns: string[] }
     }
     Enums: {
       [_ in never]: never
