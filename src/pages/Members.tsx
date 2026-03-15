@@ -1,11 +1,11 @@
 import { useState } from 'react';
 import { useFinance } from '@/lib/finance-context';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
-import { Plus, Pencil, Trash2, Users } from 'lucide-react';
+import { Plus, Pencil, Trash2, Users, Mail } from 'lucide-react';
 import { toast } from 'sonner';
 
 const Members = () => {
@@ -13,23 +13,26 @@ const Members = () => {
   const [open, setOpen] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
   const [name, setName] = useState('');
+  const [email, setEmail] = useState('');
   const [income, setIncome] = useState('');
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) { toast.error('Nome é obrigatório'); return; }
+    if (!email.trim()) { toast.error('E-mail é obrigatório'); return; }
     if (editId) {
-      updateMember({ id: editId, name: name.trim(), income: parseFloat(income) || 0 });
+      const existing = members.find(m => m.id === editId);
+      updateMember({ id: editId, name: name.trim(), email: email.trim(), income: parseFloat(income) || 0, ownerId: existing?.ownerId });
       toast.success('Membro atualizado!');
     } else {
-      addMember({ name: name.trim(), income: parseFloat(income) || 0 });
+      addMember({ name: name.trim(), email: email.trim(), income: parseFloat(income) || 0 });
       toast.success('Membro adicionado!');
     }
-    setName(''); setIncome(''); setEditId(null); setOpen(false);
+    setName(''); setEmail(''); setIncome(''); setEditId(null); setOpen(false);
   };
 
   const startEdit = (m: typeof members[0]) => {
-    setEditId(m.id); setName(m.name); setIncome(m.income.toString()); setOpen(true);
+    setEditId(m.id); setName(m.name); setEmail(m.email); setIncome(m.income.toString()); setOpen(true);
   };
 
   const getMemberTotal = (id: string) => expenses.filter(e => e.memberId === id).reduce((s, e) => s + e.amount, 0);
@@ -41,7 +44,7 @@ const Members = () => {
           <h1 className="text-2xl font-bold tracking-tight">Membros da Família</h1>
           <p className="text-muted-foreground text-sm mt-1">Gerencie os membros e suas receitas</p>
         </div>
-        <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditId(null); setName(''); setIncome(''); } }}>
+        <Dialog open={open} onOpenChange={(v) => { setOpen(v); if (!v) { setEditId(null); setName(''); setEmail(''); setIncome(''); } }}>
           <DialogTrigger asChild>
             <Button className="gap-2"><Plus className="h-4 w-4" /> Novo Membro</Button>
           </DialogTrigger>
@@ -49,6 +52,7 @@ const Members = () => {
             <DialogHeader><DialogTitle>{editId ? 'Editar Membro' : 'Novo Membro'}</DialogTitle></DialogHeader>
             <form onSubmit={handleSubmit} className="space-y-4">
               <div><Label>Nome *</Label><Input value={name} onChange={e => setName(e.target.value)} placeholder="Ex: João" /></div>
+              <div><Label>E-mail *</Label><Input type="email" value={email} onChange={e => setEmail(e.target.value)} placeholder="joao@email.com" /></div>
               <div><Label>Receita Mensal (R$)</Label><Input type="number" step="0.01" min="0" value={income} onChange={e => setIncome(e.target.value)} placeholder="0,00" /></div>
               <Button type="submit" className="w-full">{editId ? 'Salvar' : 'Adicionar'}</Button>
             </form>
@@ -78,6 +82,9 @@ const Members = () => {
                       </div>
                       <div>
                         <p className="font-semibold">{m.name}</p>
+                        <p className="text-xs text-muted-foreground flex items-center gap-1">
+                          <Mail className="h-3 w-3" /> {m.email}
+                        </p>
                         <p className="text-xs text-muted-foreground">Receita: R$ {m.income.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</p>
                       </div>
                     </div>
