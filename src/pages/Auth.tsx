@@ -71,7 +71,7 @@ export default function Auth() {
             Family Finance WS
           </CardTitle>
           <CardDescription>
-            {isLogin ? 'Entre na sua conta' : 'Crie sua conta'}
+            {isForgotPassword ? 'Recuperar sua senha' : isLogin ? 'Entre na sua conta' : 'Crie sua conta'}
           </CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
