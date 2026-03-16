@@ -104,10 +104,11 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const addCategory = useCallback(async (name: string) => {
+    if (!user) return;
     const id = crypto.randomUUID();
-    const { data, error } = await supabase.from('categories').insert({ id, name }).select().single();
+    const { data, error } = await supabase.from('categories').insert({ id, name, owner_id: user.id }).select().single();
     if (data && !error) setCategories(prev => [...prev, data]);
-  }, []);
+  }, [user]);
 
   const deleteCategory = useCallback(async (id: string) => {
     const { error } = await supabase.from('categories').delete().eq('id', id);
