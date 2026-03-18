@@ -25,7 +25,7 @@ function AuthenticatedApp() {
   return (
     <FinanceProvider>
       <SidebarProvider>
-        <div className="min-h-screen flex w-full bg-gradient-to-br from-background via-background to-background dark:from-[hsl(270,40%,8%)] dark:via-[hsl(275,35%,12%)] dark:to-[hsl(265,30%,10%)]">
+        <div className="min-h-screen flex w-full bg-gradient-to-br from-primary/5 via-background to-accent/5 dark:from-[hsl(270,40%,8%)] dark:via-[hsl(275,35%,12%)] dark:to-[hsl(265,30%,10%)]">
           <AppSidebar />
           <div className="flex-1 flex flex-col">
             <header className="h-14 flex items-center justify-between border-b bg-card/80 backdrop-blur-sm px-4">
