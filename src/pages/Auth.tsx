@@ -61,7 +61,7 @@ export default function Auth() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted p-4">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-50 via-sky-50/60 to-indigo-100/40 dark:from-[hsl(270,40%,8%)] dark:via-[hsl(275,35%,11%)] dark:to-[hsl(260,30%,14%)] p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-3">
           <div className="mx-auto h-12 w-12 rounded-xl flex items-center justify-center">
