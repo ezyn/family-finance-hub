@@ -68,7 +68,7 @@ export default function Auth() {
             <img src="/favicon.ico" alt="Family Finance WS" className="h-10 w-10" />
           </div>
           <CardTitle className="text-2xl font-bold" style={{ fontFamily: "'Nunito', sans-serif" }}>
-            Family Finance WS
+            Family Finance
           </CardTitle>
           <CardDescription>
             {isForgotPassword ? 'Recuperar sua senha' : isLogin ? 'Entre na sua conta' : 'Crie sua conta'}
