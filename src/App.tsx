@@ -76,6 +76,7 @@ const App = () => {
     <QueryClientProvider client={queryClient}>
       <TooltipProvider>
         <Sonner />
+        <InstallPWA />
         <BrowserRouter>
           {user ? (
             <AuthenticatedApp />
