@@ -65,7 +65,7 @@ export default function Auth() {
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-3">
           <div className="mx-auto h-12 w-12 rounded-xl flex items-center justify-center">
-            <img src="/favicon.ico" alt="Family Finance WS" className="h-10 w-10" />
+            <img src="/pwa-icon.png" alt="Family Finance" className="h-10 w-10" />
           </div>
           <CardTitle className="text-2xl font-bold" style={{ fontFamily: "'Nunito', sans-serif" }}>
             Family Finance
