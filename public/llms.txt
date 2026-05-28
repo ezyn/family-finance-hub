@@ -1,0 +1,10 @@
+# Family Finance
+
+> Aplicativo de controle financeiro familiar para gerenciar despesas, receitas, membros e categorias.
+
+Family Finance é um PWA que ajuda famílias a acompanhar o orçamento mensal, registrar despesas por categoria e membro, e visualizar o saldo de cada participante.
+
+## Pages
+
+- [Início](/): Página principal com login e visão geral do aplicativo.
+- [Entrar ou criar conta](/auth): Acesso à conta, cadastro de novos usuários e recuperação de senha.
