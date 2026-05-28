@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
+import { SEO } from '@/components/SEO';
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
@@ -62,6 +63,12 @@ export default function Auth() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-primary/3 to-accent/5 dark:from-[hsl(270,40%,8%)] dark:via-[hsl(275,35%,11%)] dark:to-[hsl(260,30%,14%)] p-4">
+      <SEO
+        title="Entrar ou criar conta — Family Finance"
+        description="Acesse sua conta do Family Finance para gerenciar despesas, receitas e membros da família."
+        path="/auth"
+      />
+      <h1 className="sr-only">Family Finance — Entrar ou criar conta</h1>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-3">
           <div className="mx-auto h-12 w-12 rounded-xl flex items-center justify-center">
