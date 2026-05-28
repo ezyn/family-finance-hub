@@ -38,7 +38,7 @@ function AuthenticatedApp() {
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-xs text-muted-foreground hidden sm:inline">{user?.email}</span>
-                <Button variant="ghost" size="icon" onClick={signOut} title="Sair">
+                <Button variant="ghost" size="icon" onClick={signOut} title="Sair" aria-label="Sair da conta">
                   <LogOut className="h-4 w-4" />
                 </Button>
                 <ThemeToggle />
