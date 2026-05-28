@@ -6,6 +6,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Plus, Trash2 } from 'lucide-react';
 import { toast } from 'sonner';
+import { SEO } from '@/components/SEO';
 
 const Settings = () => {
   const { categories, addCategory, deleteCategory } = useFinance();
@@ -21,6 +22,11 @@ const Settings = () => {
 
   return (
     <div className="space-y-6">
+      <SEO
+        title="Configurações — Family Finance"
+        description="Personalize categorias de despesas e preferências do seu controle financeiro familiar."
+        path="/configuracoes"
+      />
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Configurações</h1>
         <p className="text-muted-foreground text-sm mt-1">Personalize categorias e preferências</p>
@@ -36,7 +42,7 @@ const Settings = () => {
             {categories.map(c => (
               <div key={c.id} className="flex items-center justify-between p-2.5 rounded-lg bg-muted/50">
                 <span className="text-sm font-medium">{c.name}</span>
-                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { deleteCategory(c.id); toast.success('Categoria removida!'); }}>
+                <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { deleteCategory(c.id); toast.success('Categoria removida!'); }} aria-label={`Remover categoria ${c.name}`}>
                   <Trash2 className="h-3.5 w-3.5" />
                 </Button>
               </div>
