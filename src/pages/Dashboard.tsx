@@ -3,10 +3,16 @@ import { CategoryPieChart, MonthlyBarChart } from '@/components/Charts';
 import { ExpenseTable } from '@/components/ExpenseTable';
 import { MemberSpending } from '@/components/MemberSpending';
 import { IncomeManager } from '@/components/IncomeManager';
+import { SEO } from '@/components/SEO';
 
 const Dashboard = () => {
   return (
     <div className="space-y-6">
+      <SEO
+        title="Dashboard — Family Finance"
+        description="Visão geral das finanças da família: resumo de receitas, despesas e saldo do mês."
+        path="/"
+      />
       <div>
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground text-sm mt-1">Visão geral das finanças da família</p>

@@ -6,6 +6,7 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from 'sonner';
 import { useNavigate } from 'react-router-dom';
+import { SEO } from '@/components/SEO';
 
 export default function ResetPassword() {
   const [password, setPassword] = useState('');
@@ -47,6 +48,12 @@ export default function ResetPassword() {
   if (!isRecovery) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted p-4">
+        <SEO
+          title="Recuperar senha — Family Finance"
+          description="Defina uma nova senha para sua conta do Family Finance."
+          path="/reset-password"
+        />
+        <h1 className="sr-only">Family Finance — Recuperação de senha</h1>
         <Card className="w-full max-w-md">
           <CardHeader className="text-center space-y-3">
             <div className="mx-auto h-12 w-12 rounded-xl flex items-center justify-center">
@@ -69,6 +76,12 @@ export default function ResetPassword() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-background via-background to-muted p-4">
+      <SEO
+        title="Nova senha — Family Finance"
+        description="Defina uma nova senha para sua conta do Family Finance."
+        path="/reset-password"
+      />
+      <h1 className="sr-only">Family Finance — Nova senha</h1>
       <Card className="w-full max-w-md">
         <CardHeader className="text-center space-y-3">
           <div className="mx-auto h-12 w-12 rounded-xl flex items-center justify-center">

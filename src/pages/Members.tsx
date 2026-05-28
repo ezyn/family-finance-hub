@@ -7,6 +7,7 @@ import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Plus, Pencil, Trash2, Users, Mail } from 'lucide-react';
 import { toast } from 'sonner';
+import { SEO } from '@/components/SEO';
 
 const Members = () => {
   const { members, addMember, updateMember, deleteMember, expenses } = useFinance();
@@ -39,6 +40,11 @@ const Members = () => {
 
   return (
     <div className="space-y-6">
+      <SEO
+        title="Membros — Family Finance"
+        description="Gerencie os membros da família, suas receitas mensais e visualize o saldo individual."
+        path="/membros"
+      />
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">Membros da Família</h1>
@@ -89,8 +95,8 @@ const Members = () => {
                       </div>
                     </div>
                     <div className="flex gap-1">
-                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => startEdit(m)}><Pencil className="h-3.5 w-3.5" /></Button>
-                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { deleteMember(m.id); toast.success('Membro removido!'); }}><Trash2 className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => startEdit(m)} aria-label={`Editar ${m.name}`}><Pencil className="h-3.5 w-3.5" /></Button>
+                      <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => { deleteMember(m.id); toast.success('Membro removido!'); }} aria-label={`Remover ${m.name}`}><Trash2 className="h-3.5 w-3.5" /></Button>
                     </div>
                   </div>
                   <div className="mt-4 pt-3 border-t grid grid-cols-2 gap-2 text-sm">
