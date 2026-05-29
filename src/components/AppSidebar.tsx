@@ -1,4 +1,4 @@
-import { LayoutDashboard, Receipt, Users, Settings, Wallet } from 'lucide-react';
+import { LayoutDashboard, Receipt, Users, Settings, Wallet, Target } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import {
   Sidebar,
@@ -14,6 +14,7 @@ import {
 const items = [
   { title: 'Dashboard', url: '/', icon: LayoutDashboard },
   { title: 'Despesas', url: '/despesas', icon: Receipt },
+  { title: 'Planejamento', url: '/planejamento', icon: Target },
   { title: 'Membros', url: '/membros', icon: Users },
   { title: 'Configurações', url: '/configuracoes', icon: Settings },
 ];
