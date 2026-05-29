@@ -14,6 +14,30 @@ export type Database = {
   }
   public: {
     Tables: {
+      budgets: {
+        Row: {
+          amount: number
+          category: string
+          created_at: string
+          id: string
+          owner_id: string
+        }
+        Insert: {
+          amount?: number
+          category: string
+          created_at?: string
+          id?: string
+          owner_id: string
+        }
+        Update: {
+          amount?: number
+          category?: string
+          created_at?: string
+          id?: string
+          owner_id?: string
+        }
+        Relationships: []
+      }
       categories: {
         Row: {
           created_at: string
@@ -140,6 +164,51 @@ export type Database = {
           display_name?: string | null
           id?: string
           updated_at?: string
+        }
+        Relationships: []
+      }
+      recurring_expenses: {
+        Row: {
+          active: boolean
+          amount: number
+          category: string
+          created_at: string
+          day_of_month: number
+          id: string
+          last_generated: string | null
+          member_id: string
+          name: string
+          note: string | null
+          owner_id: string
+          payment_method: string
+        }
+        Insert: {
+          active?: boolean
+          amount?: number
+          category: string
+          created_at?: string
+          day_of_month?: number
+          id?: string
+          last_generated?: string | null
+          member_id: string
+          name: string
+          note?: string | null
+          owner_id: string
+          payment_method: string
+        }
+        Update: {
+          active?: boolean
+          amount?: number
+          category?: string
+          created_at?: string
+          day_of_month?: number
+          id?: string
+          last_generated?: string | null
+          member_id?: string
+          name?: string
+          note?: string | null
+          owner_id?: string
+          payment_method?: string
         }
         Relationships: []
       }
