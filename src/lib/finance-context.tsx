@@ -129,17 +129,108 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     if (!error) setCategories(prev => prev.filter(x => x.id !== id));
   }, []);
 
+  const setBudget = useCallback(async (category: string, amount: number) => {
+    if (!user) return;
+    const { data, error } = await supabase.from('budgets')
+      .upsert({ owner_id: user.id, category, amount }, { onConflict: 'owner_id,category' })
+      .select().single();
+    if (data && !error) {
+      setBudgets(prev => {
+        const exists = prev.some(b => b.category === category);
+        const mapped = mapBudget(data);
+        return exists ? prev.map(b => b.category === category ? mapped : b) : [...prev, mapped];
+      });
+    }
+  }, [user]);
+
+  const deleteBudget = useCallback(async (id: string) => {
+    const { error } = await supabase.from('budgets').delete().eq('id', id);
+    if (!error) setBudgets(prev => prev.filter(b => b.id !== id));
+  }, []);
+
+  const addRecurring = useCallback(async (r: Omit<RecurringExpense, 'id' | 'ownerId' | 'lastGenerated'>) => {
+    if (!user) return;
+    const { data, error } = await supabase.from('recurring_expenses').insert({
+      owner_id: user.id,
+      name: r.name,
+      amount: r.amount,
+      category: r.category,
+      payment_method: r.paymentMethod,
+      member_id: r.memberId,
+      day_of_month: r.dayOfMonth,
+      note: r.note || null,
+      active: r.active,
+    }).select().single();
+    if (data && !error) setRecurring(prev => [...prev, mapRecurring(data)]);
+  }, [user]);
+
+  const updateRecurring = useCallback(async (r: RecurringExpense) => {
+    const { data, error } = await supabase.from('recurring_expenses').update({
+      name: r.name,
+      amount: r.amount,
+      category: r.category,
+      payment_method: r.paymentMethod,
+      member_id: r.memberId,
+      day_of_month: r.dayOfMonth,
+      note: r.note || null,
+      active: r.active,
+    }).eq('id', r.id).select().single();
+    if (data && !error) setRecurring(prev => prev.map(x => x.id === r.id ? mapRecurring(data) : x));
+  }, []);
+
+  const deleteRecurring = useCallback(async (id: string) => {
+    const { error } = await supabase.from('recurring_expenses').delete().eq('id', id);
+    if (!error) setRecurring(prev => prev.filter(x => x.id !== id));
+  }, []);
+
+  // Auto-generate due recurring expenses for the current month
+  useEffect(() => {
+    if (loading || recurring.length === 0) return;
+    const now = new Date();
+    const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+    const generate = async () => {
+      for (const r of recurring) {
+        if (!r.active) continue;
+        const alreadyThisMonth = r.lastGenerated?.slice(0, 7) === monthKey;
+        if (alreadyThisMonth) continue;
+        if (now.getDate() < r.dayOfMonth) continue;
+        const day = Math.min(r.dayOfMonth, new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate());
+        const date = `${monthKey}-${String(day).padStart(2, '0')}`;
+        const { data, error } = await supabase.from('expenses').insert({
+          name: r.name,
+          amount: r.amount,
+          category: r.category,
+          payment_method: r.paymentMethod,
+          date,
+          member_id: r.memberId,
+          note: r.note || 'Despesa recorrente',
+        }).select().single();
+        if (data && !error) {
+          setExpenses(prev => [mapExpense(data), ...prev]);
+          const { data: upd } = await supabase.from('recurring_expenses')
+            .update({ last_generated: date }).eq('id', r.id).select().single();
+          if (upd) setRecurring(prev => prev.map(x => x.id === r.id ? mapRecurring(upd) : x));
+        }
+      }
+    };
+    generate();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loading]);
+
   return (
     <FinanceContext.Provider value={{
-      expenses, members, categories, loading,
+      expenses, members, categories, budgets, recurring, loading,
       addExpense, updateExpense, deleteExpense,
       addMember, updateMember, deleteMember,
       addCategory, deleteCategory,
+      setBudget, deleteBudget,
+      addRecurring, updateRecurring, deleteRecurring,
     }}>
       {children}
     </FinanceContext.Provider>
   );
 }
+
 
 export function useFinance() {
   const ctx = useContext(FinanceContext);
