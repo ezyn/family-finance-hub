@@ -261,3 +261,28 @@ function mapMember(row: any): FamilyMember {
     ownerId: row.owner_id,
   };
 }
+
+function mapBudget(row: any): Budget {
+  return {
+    id: row.id,
+    category: row.category,
+    amount: Number(row.amount),
+    ownerId: row.owner_id,
+  };
+}
+
+function mapRecurring(row: any): RecurringExpense {
+  return {
+    id: row.id,
+    name: row.name,
+    amount: Number(row.amount),
+    category: row.category,
+    paymentMethod: row.payment_method as PaymentMethod,
+    memberId: row.member_id,
+    dayOfMonth: row.day_of_month,
+    note: row.note || undefined,
+    active: row.active,
+    lastGenerated: row.last_generated || undefined,
+    ownerId: row.owner_id,
+  };
+}
