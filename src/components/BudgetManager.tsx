@@ -92,7 +92,7 @@ export function BudgetManager() {
               <div key={b.id} className="space-y-1.5">
                 <div className="flex items-center justify-between text-sm">
                   <span className="font-medium flex items-center gap-1.5">
-                    {(over || near) && <AlertTriangle className={`h-3.5 w-3.5 ${over ? 'text-destructive' : 'text-[hsl(var(--warning,38_92%_50%))]'}`} />}
+                    {(over || near) && <AlertTriangle className={`h-3.5 w-3.5 ${over ? 'text-destructive' : 'text-[hsl(var(--warning))]'}`} />}
                     {catName(b.category)}
                   </span>
                   <span className={over ? 'text-destructive font-semibold' : 'text-muted-foreground'}>
