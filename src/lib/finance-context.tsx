@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Expense, FamilyMember, Category, DEFAULT_CATEGORIES } from './types';
+import { Expense, FamilyMember, Category, Budget, RecurringExpense, DEFAULT_CATEGORIES } from './types';
 import type { PaymentMethod } from './types';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -8,6 +8,8 @@ interface FinanceContextType {
   expenses: Expense[];
   members: FamilyMember[];
   categories: Category[];
+  budgets: Budget[];
+  recurring: RecurringExpense[];
   loading: boolean;
   addExpense: (e: Omit<Expense, 'id'>) => void;
   updateExpense: (e: Expense) => void;
@@ -17,6 +19,11 @@ interface FinanceContextType {
   deleteMember: (id: string) => void;
   addCategory: (name: string) => void;
   deleteCategory: (id: string) => void;
+  setBudget: (category: string, amount: number) => void;
+  deleteBudget: (id: string) => void;
+  addRecurring: (r: Omit<RecurringExpense, 'id' | 'ownerId' | 'lastGenerated'>) => void;
+  updateRecurring: (r: RecurringExpense) => void;
+  deleteRecurring: (id: string) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | null>(null);
@@ -26,24 +33,31 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [members, setMembers] = useState<FamilyMember[]>([]);
   const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
+  const [budgets, setBudgets] = useState<Budget[]>([]);
+  const [recurring, setRecurring] = useState<RecurringExpense[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     const fetchAll = async () => {
       setLoading(true);
-      const [expRes, memRes, catRes] = await Promise.all([
+      const [expRes, memRes, catRes, budRes, recRes] = await Promise.all([
         supabase.from('expenses').select('*').order('created_at', { ascending: false }),
         supabase.from('family_members').select('*').order('created_at', { ascending: true }),
         supabase.from('categories').select('*').order('created_at', { ascending: true }),
+        supabase.from('budgets').select('*'),
+        supabase.from('recurring_expenses').select('*').order('created_at', { ascending: true }),
       ]);
       if (expRes.data) setExpenses(expRes.data.map(mapExpense));
       if (memRes.data) setMembers(memRes.data.map(mapMember));
       if (catRes.data && catRes.data.length > 0) setCategories(catRes.data);
+      if (budRes.data) setBudgets(budRes.data.map(mapBudget));
+      if (recRes.data) setRecurring(recRes.data.map(mapRecurring));
       setLoading(false);
     };
     fetchAll();
   }, [user]);
+
 
   const addExpense = useCallback(async (e: Omit<Expense, 'id'>) => {
     const { data, error } = await supabase.from('expenses').insert({
