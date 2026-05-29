@@ -3,6 +3,8 @@ import { CategoryPieChart, MonthlyBarChart } from '@/components/Charts';
 import { ExpenseTable } from '@/components/ExpenseTable';
 import { MemberSpending } from '@/components/MemberSpending';
 import { IncomeManager } from '@/components/IncomeManager';
+import { BudgetManager } from '@/components/BudgetManager';
+import { FinancialHealthAlert } from '@/components/FinancialHealthAlert';
 import { SEO } from '@/components/SEO';
 
 const Dashboard = () => {
