@@ -19,11 +19,13 @@ const Dashboard = () => {
         <h1 className="text-2xl font-bold tracking-tight">Dashboard</h1>
         <p className="text-muted-foreground text-sm mt-1">Visão geral das finanças da família</p>
       </div>
+      <FinancialHealthAlert />
       <SummaryCards />
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <CategoryPieChart />
         <MonthlyBarChart />
       </div>
+      <BudgetManager />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-2">
           <ExpenseTable />
