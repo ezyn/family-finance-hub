@@ -33,6 +33,27 @@ export interface Category {
   icon?: string;
 }
 
+export interface Budget {
+  id: string;
+  category: string;
+  amount: number;
+  ownerId?: string;
+}
+
+export interface RecurringExpense {
+  id: string;
+  name: string;
+  amount: number;
+  category: string;
+  paymentMethod: PaymentMethod;
+  memberId: string;
+  dayOfMonth: number;
+  note?: string;
+  active: boolean;
+  lastGenerated?: string;
+  ownerId?: string;
+}
+
 export const DEFAULT_CATEGORIES: Category[] = [
   { id: 'alimentacao', name: 'Alimentação' },
   { id: 'transporte', name: 'Transporte' },
