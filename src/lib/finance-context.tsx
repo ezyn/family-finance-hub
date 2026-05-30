@@ -327,3 +327,14 @@ function mapRecurring(row: any): RecurringExpense {
     ownerId: row.owner_id,
   };
 }
+
+function mapComment(row: any): ExpenseComment {
+  return {
+    id: row.id,
+    expenseId: row.expense_id,
+    authorId: row.author_id,
+    authorName: row.author_name,
+    content: row.content,
+    createdAt: row.created_at,
+  };
+}
