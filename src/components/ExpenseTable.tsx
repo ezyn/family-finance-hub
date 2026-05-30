@@ -90,6 +90,15 @@ export function ExpenseTable() {
               {members.map(m => <SelectItem key={m.id} value={m.id}>{m.name}</SelectItem>)}
             </SelectContent>
           </Select>
+          <Select value={periodFilter} onValueChange={setPeriodFilter}>
+            <SelectTrigger className="w-[180px]"><SelectValue placeholder="Período" /></SelectTrigger>
+            <SelectContent>
+              <SelectItem value="all">Todo período</SelectItem>
+              <SelectItem value="thisMonth">Este mês</SelectItem>
+              <SelectItem value="lastMonth">Mês anterior</SelectItem>
+              <SelectItem value="thisYear">Este ano</SelectItem>
+            </SelectContent>
+          </Select>
         </div>
         <div className="rounded-lg overflow-hidden border">
           <Table>
