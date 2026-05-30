@@ -119,7 +119,12 @@ export function ExpenseTable() {
                 <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhuma despesa encontrada</TableCell></TableRow>
               ) : filtered.map(e => (
                 <TableRow key={e.id}>
-                  <TableCell className="font-medium">{e.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <span className="flex items-center gap-1.5">
+                      {e.name}
+                      {e.receiptUrl && <Paperclip className="h-3 w-3 text-muted-foreground" />}
+                    </span>
+                  </TableCell>
                   <TableCell>R$ {e.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
                   <TableCell className="hidden sm:table-cell">{getCategoryName(e.category)}</TableCell>
                   <TableCell className="hidden sm:table-cell">{getPaymentLabel(e.paymentMethod || '')}</TableCell>
@@ -127,6 +132,10 @@ export function ExpenseTable() {
                   <TableCell className="hidden md:table-cell">{getMemberName(e.memberId)}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
+                      <ExpenseDetail
+                        expense={e}
+                        trigger={<Button variant="ghost" size="icon" className="h-7 w-7"><MessageSquare className="h-3.5 w-3.5" /></Button>}
+                      />
                       <ExpenseForm
                         expense={e}
                         trigger={<Button variant="ghost" size="icon" className="h-7 w-7"><Pencil className="h-3.5 w-3.5" /></Button>}
