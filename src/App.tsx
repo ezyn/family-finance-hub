@@ -13,6 +13,7 @@ import Dashboard from "./pages/Dashboard";
 import Expenses from "./pages/Expenses";
 import Members from "./pages/Members";
 import Planning from "./pages/Planning";
+import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
@@ -50,6 +51,7 @@ function AuthenticatedApp() {
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/despesas" element={<Expenses />} />
                 <Route path="/planejamento" element={<Planning />} />
+                <Route path="/relatorios" element={<Reports />} />
                 <Route path="/membros" element={<Members />} />
                 <Route path="/configuracoes" element={<Settings />} />
                 <Route path="/auth" element={<Navigate to="/" replace />} />

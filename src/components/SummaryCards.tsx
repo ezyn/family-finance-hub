@@ -1,11 +1,13 @@
 import { useMemo } from 'react';
+import { motion } from 'framer-motion';
 import { DollarSign, TrendingDown, TrendingUp, Wallet } from 'lucide-react';
 import { Card, CardContent } from '@/components/ui/card';
+import { Skeleton } from '@/components/ui/skeleton';
 import { useFinance } from '@/lib/finance-context';
 import { startOfMonth, startOfWeek, isAfter } from 'date-fns';
 
 export function SummaryCards() {
-  const { expenses, members } = useFinance();
+  const { expenses, members, loading } = useFinance();
 
   const stats = useMemo(() => {
     const now = new Date();
@@ -32,24 +34,51 @@ export function SummaryCards() {
     { label: 'Receita Total', value: stats.totalIncome, icon: TrendingUp, color: 'text-[hsl(var(--success))]' },
   ];
 
+  if (loading) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <Card key={i} className="border-none shadow-sm">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between">
+                <div className="space-y-2">
+                  <Skeleton className="h-4 w-24" />
+                  <Skeleton className="h-7 w-28" />
+                </div>
+                <Skeleton className="h-11 w-11 rounded-xl" />
+              </div>
+            </CardContent>
+          </Card>
+        ))}
+      </div>
+    );
+  }
+
   return (
     <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-      {cards.map(c => (
-        <Card key={c.label} className="border-none shadow-sm hover:shadow-md transition-shadow">
-          <CardContent className="p-5">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm text-muted-foreground">{c.label}</p>
-                <p className={`text-2xl font-bold mt-1 font-[family-name:var(--font-heading)]`}>
-                  R$ {c.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
-                </p>
+      {cards.map((c, i) => (
+        <motion.div
+          key={c.label}
+          initial={{ opacity: 0, y: 12 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.08, duration: 0.3 }}
+        >
+          <Card className="border-none shadow-sm hover:shadow-md transition-shadow">
+            <CardContent className="p-5">
+              <div className="flex items-center justify-between">
+                <div>
+                  <p className="text-sm text-muted-foreground">{c.label}</p>
+                  <p className={`text-2xl font-bold mt-1 font-[family-name:var(--font-heading)]`}>
+                    R$ {c.value.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}
+                  </p>
+                </div>
+                <div className={`p-3 rounded-xl bg-muted ${c.color}`}>
+                  <c.icon className="h-5 w-5" />
+                </div>
               </div>
-              <div className={`p-3 rounded-xl bg-muted ${c.color}`}>
-                <c.icon className="h-5 w-5" />
-              </div>
-            </div>
-          </CardContent>
-        </Card>
+            </CardContent>
+          </Card>
+        </motion.div>
       ))}
     </div>
   );
