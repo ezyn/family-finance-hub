@@ -111,7 +111,7 @@ export function ExpenseTable() {
                 <TableHead className="hidden sm:table-cell">Pagamento</TableHead>
                 <TableHead className="hidden sm:table-cell">Data</TableHead>
                 <TableHead className="hidden md:table-cell">Membro</TableHead>
-                <TableHead className="w-[80px]">Ações</TableHead>
+                <TableHead className="w-[120px]">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
