@@ -288,6 +288,7 @@ function mapExpense(row: any): Expense {
     date: row.date,
     memberId: row.member_id,
     note: row.note || undefined,
+    receiptUrl: row.receipt_url || undefined,
   };
 }
 
