@@ -24,6 +24,11 @@ interface FinanceContextType {
   addRecurring: (r: Omit<RecurringExpense, 'id' | 'ownerId' | 'lastGenerated'>) => void;
   updateRecurring: (r: RecurringExpense) => void;
   deleteRecurring: (id: string) => void;
+  uploadReceipt: (expenseId: string, file: File) => Promise<void>;
+  removeReceipt: (expenseId: string) => Promise<void>;
+  fetchComments: (expenseId: string) => Promise<ExpenseComment[]>;
+  addComment: (expenseId: string, content: string) => Promise<ExpenseComment | null>;
+  deleteComment: (id: string) => Promise<void>;
 }
 
 const FinanceContext = createContext<FinanceContextType | null>(null);
