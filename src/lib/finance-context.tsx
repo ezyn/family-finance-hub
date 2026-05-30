@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Expense, FamilyMember, Category, Budget, RecurringExpense, DEFAULT_CATEGORIES } from './types';
+import { Expense, FamilyMember, Category, Budget, RecurringExpense, ExpenseComment, DEFAULT_CATEGORIES } from './types';
 import type { PaymentMethod } from './types';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -24,6 +24,11 @@ interface FinanceContextType {
   addRecurring: (r: Omit<RecurringExpense, 'id' | 'ownerId' | 'lastGenerated'>) => void;
   updateRecurring: (r: RecurringExpense) => void;
   deleteRecurring: (id: string) => void;
+  uploadReceipt: (expenseId: string, file: File) => Promise<void>;
+  removeReceipt: (expenseId: string) => Promise<void>;
+  fetchComments: (expenseId: string) => Promise<ExpenseComment[]>;
+  addComment: (expenseId: string, content: string) => Promise<ExpenseComment | null>;
+  deleteComment: (id: string) => Promise<void>;
 }
 
 const FinanceContext = createContext<FinanceContextType | null>(null);
@@ -183,7 +188,41 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     if (!error) setRecurring(prev => prev.filter(x => x.id !== id));
   }, []);
 
-  // Auto-generate due recurring expenses for the current month
+  const uploadReceipt = useCallback(async (expenseId: string, file: File) => {
+    if (!user) return;
+    const ext = file.name.split('.').pop() || 'jpg';
+    const path = `${user.id}/${expenseId}-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from('receipts').upload(path, file, { upsert: true });
+    if (upErr) return;
+    const { data: pub } = supabase.storage.from('receipts').getPublicUrl(path);
+    const { data, error } = await supabase.from('expenses').update({ receipt_url: pub.publicUrl }).eq('id', expenseId).select().single();
+    if (data && !error) setExpenses(prev => prev.map(x => x.id === expenseId ? mapExpense(data) : x));
+  }, [user]);
+
+  const removeReceipt = useCallback(async (expenseId: string) => {
+    const { data, error } = await supabase.from('expenses').update({ receipt_url: null }).eq('id', expenseId).select().single();
+    if (data && !error) setExpenses(prev => prev.map(x => x.id === expenseId ? mapExpense(data) : x));
+  }, []);
+
+  const fetchComments = useCallback(async (expenseId: string): Promise<ExpenseComment[]> => {
+    const { data } = await supabase.from('expense_comments').select('*').eq('expense_id', expenseId).order('created_at', { ascending: true });
+    return (data || []).map(mapComment);
+  }, []);
+
+  const addComment = useCallback(async (expenseId: string, content: string): Promise<ExpenseComment | null> => {
+    if (!user) return null;
+    const authorName = members.find(m => m.email === user.email)?.name || user.email?.split('@')[0] || 'Membro';
+    const { data, error } = await supabase.from('expense_comments').insert({
+      expense_id: expenseId, author_id: user.id, author_name: authorName, content,
+    }).select().single();
+    return data && !error ? mapComment(data) : null;
+  }, [user, members]);
+
+  const deleteComment = useCallback(async (id: string) => {
+    await supabase.from('expense_comments').delete().eq('id', id);
+  }, []);
+
+
   useEffect(() => {
     if (loading || recurring.length === 0) return;
     const now = new Date();
@@ -225,6 +264,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       addCategory, deleteCategory,
       setBudget, deleteBudget,
       addRecurring, updateRecurring, deleteRecurring,
+      uploadReceipt, removeReceipt, fetchComments, addComment, deleteComment,
     }}>
       {children}
     </FinanceContext.Provider>
@@ -248,6 +288,7 @@ function mapExpense(row: any): Expense {
     date: row.date,
     memberId: row.member_id,
     note: row.note || undefined,
+    receiptUrl: row.receipt_url || undefined,
   };
 }
 
@@ -284,5 +325,16 @@ function mapRecurring(row: any): RecurringExpense {
     active: row.active,
     lastGenerated: row.last_generated || undefined,
     ownerId: row.owner_id,
+  };
+}
+
+function mapComment(row: any): ExpenseComment {
+  return {
+    id: row.id,
+    expenseId: row.expense_id,
+    authorId: row.author_id,
+    authorName: row.author_name,
+    content: row.content,
+    createdAt: row.created_at,
   };
 }

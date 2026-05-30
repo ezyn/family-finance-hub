@@ -62,6 +62,33 @@ export type Database = {
         }
         Relationships: []
       }
+      expense_comments: {
+        Row: {
+          author_id: string
+          author_name: string
+          content: string
+          created_at: string
+          expense_id: string
+          id: string
+        }
+        Insert: {
+          author_id: string
+          author_name: string
+          content: string
+          created_at?: string
+          expense_id: string
+          id?: string
+        }
+        Update: {
+          author_id?: string
+          author_name?: string
+          content?: string
+          created_at?: string
+          expense_id?: string
+          id?: string
+        }
+        Relationships: []
+      }
       expenses: {
         Row: {
           amount: number
@@ -73,6 +100,7 @@ export type Database = {
           name: string
           note: string | null
           payment_method: string
+          receipt_url: string | null
         }
         Insert: {
           amount: number
@@ -84,6 +112,7 @@ export type Database = {
           name: string
           note?: string | null
           payment_method: string
+          receipt_url?: string | null
         }
         Update: {
           amount?: number
@@ -95,6 +124,7 @@ export type Database = {
           name?: string
           note?: string | null
           payment_method?: string
+          receipt_url?: string | null
         }
         Relationships: [
           {

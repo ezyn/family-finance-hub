@@ -7,7 +7,8 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { ExpenseForm } from './ExpenseForm';
-import { Pencil, Trash2, Search, Download } from 'lucide-react';
+import { ExpenseDetail } from './ExpenseDetail';
+import { Pencil, Trash2, Search, Download, MessageSquare, Paperclip } from 'lucide-react';
 import { toast } from 'sonner';
 import { format, startOfMonth, endOfMonth, subMonths, startOfYear } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
@@ -110,7 +111,7 @@ export function ExpenseTable() {
                 <TableHead className="hidden sm:table-cell">Pagamento</TableHead>
                 <TableHead className="hidden sm:table-cell">Data</TableHead>
                 <TableHead className="hidden md:table-cell">Membro</TableHead>
-                <TableHead className="w-[80px]">Ações</TableHead>
+                <TableHead className="w-[120px]">Ações</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -118,7 +119,12 @@ export function ExpenseTable() {
                 <TableRow><TableCell colSpan={7} className="text-center text-muted-foreground py-8">Nenhuma despesa encontrada</TableCell></TableRow>
               ) : filtered.map(e => (
                 <TableRow key={e.id}>
-                  <TableCell className="font-medium">{e.name}</TableCell>
+                  <TableCell className="font-medium">
+                    <span className="flex items-center gap-1.5">
+                      {e.name}
+                      {e.receiptUrl && <Paperclip className="h-3 w-3 text-muted-foreground" />}
+                    </span>
+                  </TableCell>
                   <TableCell>R$ {e.amount.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}</TableCell>
                   <TableCell className="hidden sm:table-cell">{getCategoryName(e.category)}</TableCell>
                   <TableCell className="hidden sm:table-cell">{getPaymentLabel(e.paymentMethod || '')}</TableCell>
@@ -126,6 +132,10 @@ export function ExpenseTable() {
                   <TableCell className="hidden md:table-cell">{getMemberName(e.memberId)}</TableCell>
                   <TableCell>
                     <div className="flex gap-1">
+                      <ExpenseDetail
+                        expense={e}
+                        trigger={<Button variant="ghost" size="icon" className="h-7 w-7"><MessageSquare className="h-3.5 w-3.5" /></Button>}
+                      />
                       <ExpenseForm
                         expense={e}
                         trigger={<Button variant="ghost" size="icon" className="h-7 w-7"><Pencil className="h-3.5 w-3.5" /></Button>}

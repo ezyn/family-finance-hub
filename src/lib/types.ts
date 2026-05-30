@@ -25,6 +25,16 @@ export interface Expense {
   date: string;
   memberId: string;
   note?: string;
+  receiptUrl?: string;
+}
+
+export interface ExpenseComment {
+  id: string;
+  expenseId: string;
+  authorId: string;
+  authorName: string;
+  content: string;
+  createdAt: string;
 }
 
 export interface Category {
