@@ -188,7 +188,41 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     if (!error) setRecurring(prev => prev.filter(x => x.id !== id));
   }, []);
 
-  // Auto-generate due recurring expenses for the current month
+  const uploadReceipt = useCallback(async (expenseId: string, file: File) => {
+    if (!user) return;
+    const ext = file.name.split('.').pop() || 'jpg';
+    const path = `${user.id}/${expenseId}-${Date.now()}.${ext}`;
+    const { error: upErr } = await supabase.storage.from('receipts').upload(path, file, { upsert: true });
+    if (upErr) return;
+    const { data: pub } = supabase.storage.from('receipts').getPublicUrl(path);
+    const { data, error } = await supabase.from('expenses').update({ receipt_url: pub.publicUrl }).eq('id', expenseId).select().single();
+    if (data && !error) setExpenses(prev => prev.map(x => x.id === expenseId ? mapExpense(data) : x));
+  }, [user]);
+
+  const removeReceipt = useCallback(async (expenseId: string) => {
+    const { data, error } = await supabase.from('expenses').update({ receipt_url: null }).eq('id', expenseId).select().single();
+    if (data && !error) setExpenses(prev => prev.map(x => x.id === expenseId ? mapExpense(data) : x));
+  }, []);
+
+  const fetchComments = useCallback(async (expenseId: string): Promise<ExpenseComment[]> => {
+    const { data } = await supabase.from('expense_comments').select('*').eq('expense_id', expenseId).order('created_at', { ascending: true });
+    return (data || []).map(mapComment);
+  }, []);
+
+  const addComment = useCallback(async (expenseId: string, content: string): Promise<ExpenseComment | null> => {
+    if (!user) return null;
+    const authorName = members.find(m => m.email === user.email)?.name || user.email?.split('@')[0] || 'Membro';
+    const { data, error } = await supabase.from('expense_comments').insert({
+      expense_id: expenseId, author_id: user.id, author_name: authorName, content,
+    }).select().single();
+    return data && !error ? mapComment(data) : null;
+  }, [user, members]);
+
+  const deleteComment = useCallback(async (id: string) => {
+    await supabase.from('expense_comments').delete().eq('id', id);
+  }, []);
+
+
   useEffect(() => {
     if (loading || recurring.length === 0) return;
     const now = new Date();
