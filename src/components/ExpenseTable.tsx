@@ -9,7 +9,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { ExpenseForm } from './ExpenseForm';
 import { Pencil, Trash2, Search, Download } from 'lucide-react';
 import { toast } from 'sonner';
-import { format } from 'date-fns';
+import { format, startOfMonth, endOfMonth, subMonths, startOfYear } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 export function ExpenseTable() {
@@ -17,16 +17,28 @@ export function ExpenseTable() {
   const [search, setSearch] = useState('');
   const [catFilter, setCatFilter] = useState('all');
   const [memberFilter, setMemberFilter] = useState('all');
+  const [periodFilter, setPeriodFilter] = useState('all');
   const [editingExpense, setEditingExpense] = useState<string | null>(null);
+
+  const periodRange = useMemo(() => {
+    const now = new Date();
+    switch (periodFilter) {
+      case 'thisMonth': return { start: startOfMonth(now), end: endOfMonth(now) };
+      case 'lastMonth': { const p = subMonths(now, 1); return { start: startOfMonth(p), end: endOfMonth(p) }; }
+      case 'thisYear': return { start: startOfYear(now), end: now };
+      default: return null;
+    }
+  }, [periodFilter]);
 
   const filtered = useMemo(() => {
     return expenses.filter(e => {
       if (search && !e.name.toLowerCase().includes(search.toLowerCase())) return false;
       if (catFilter !== 'all' && e.category !== catFilter) return false;
       if (memberFilter !== 'all' && e.memberId !== memberFilter) return false;
+      if (periodRange) { const d = new Date(e.date); if (d < periodRange.start || d > periodRange.end) return false; }
       return true;
     });
-  }, [expenses, search, catFilter, memberFilter]);
+  }, [expenses, search, catFilter, memberFilter, periodRange]);
 
   const getMemberName = (id: string) => members.find(m => m.id === id)?.name || 'Desconhecido';
   const getCategoryName = (id: string) => categories.find(c => c.id === id)?.name || id;
