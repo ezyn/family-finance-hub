@@ -410,3 +410,16 @@ function mapComment(row: any): ExpenseComment {
     createdAt: row.created_at,
   };
 }
+
+function mapLog(row: any): ChangeLog {
+  return {
+    id: row.id,
+    ownerId: row.owner_id,
+    actorId: row.actor_id,
+    actorName: row.author_name ?? row.actor_name,
+    action: row.action,
+    entity: row.entity,
+    summary: row.summary,
+    createdAt: row.created_at,
+  };
+}
