@@ -15,10 +15,12 @@ import Members from "./pages/Members";
 import Planning from "./pages/Planning";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
+import Data from "./pages/Data";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import { InstallPWA } from "./components/InstallPWA";
+import { BottomNav } from "./components/BottomNav";
 
 const queryClient = new QueryClient();
 
