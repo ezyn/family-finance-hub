@@ -335,6 +335,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setBudget, deleteBudget,
       addRecurring, updateRecurring, deleteRecurring,
       uploadReceipt, removeReceipt, fetchComments, addComment, deleteComment,
+      fetchDeletedExpenses, restoreExpense, permanentlyDeleteExpense, fetchLogs, exportBackup,
     }}>
       {children}
     </FinanceContext.Provider>
