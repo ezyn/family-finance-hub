@@ -69,6 +69,20 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   }, [user]);
 
 
+  const logAction = useCallback(async (
+    action: ChangeLog['action'], entity: string, summary: string, ownerId?: string,
+  ) => {
+    if (!user) return;
+    const owner = ownerId || user.id;
+    const authorName = members.find(m => m.email === user.email)?.name || user.email?.split('@')[0] || 'Membro';
+    await supabase.from('change_logs').insert({
+      owner_id: owner, actor_id: user.id, actor_name: authorName, action, entity, summary,
+    });
+  }, [user, members]);
+
+  const ownerForMember = useCallback((memberId: string) =>
+    members.find(m => m.id === memberId)?.ownerId, [members]);
+
   const addExpense = useCallback(async (e: Omit<Expense, 'id'>) => {
     const { data, error } = await supabase.from('expenses').insert({
       name: e.name,
@@ -79,8 +93,11 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       member_id: e.memberId,
       note: e.note || null,
     }).select().single();
-    if (data && !error) setExpenses(prev => [mapExpense(data), ...prev]);
-  }, []);
+    if (data && !error) {
+      setExpenses(prev => [mapExpense(data), ...prev]);
+      logAction('create', 'expense', `Adicionou "${e.name}" (R$ ${e.amount.toFixed(2)})`, ownerForMember(e.memberId));
+    }
+  }, [logAction, ownerForMember]);
 
   const updateExpense = useCallback(async (e: Expense) => {
     const { data, error } = await supabase.from('expenses').update({
@@ -92,12 +109,20 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       member_id: e.memberId,
       note: e.note || null,
     }).eq('id', e.id).select().single();
-    if (data && !error) setExpenses(prev => prev.map(x => x.id === e.id ? mapExpense(data) : x));
-  }, []);
+    if (data && !error) {
+      setExpenses(prev => prev.map(x => x.id === e.id ? mapExpense(data) : x));
+      logAction('update', 'expense', `Editou "${e.name}" (R$ ${e.amount.toFixed(2)})`, ownerForMember(e.memberId));
+    }
+  }, [logAction, ownerForMember]);
 
   const deleteExpense = useCallback(async (id: string) => {
-    const { error } = await supabase.from('expenses').delete().eq('id', id);
-    if (!error) setExpenses(prev => prev.filter(x => x.id !== id));
+    const exp = expenses.find(x => x.id === id);
+    const { error } = await supabase.from('expenses').update({ deleted_at: new Date().toISOString() }).eq('id', id);
+    if (!error) {
+      setExpenses(prev => prev.filter(x => x.id !== id));
+      if (exp) logAction('delete', 'expense', `Excluiu "${exp.name}" (R$ ${exp.amount.toFixed(2)})`, ownerForMember(exp.memberId));
+    }
+
   }, []);
 
   const addMember = useCallback(async (m: Omit<FamilyMember, 'id' | 'ownerId'>) => {
