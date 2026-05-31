@@ -123,7 +123,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       if (exp) logAction('delete', 'expense', `Excluiu "${exp.name}" (R$ ${exp.amount.toFixed(2)})`, ownerForMember(exp.memberId));
     }
 
-  }, []);
+  }, [expenses, logAction, ownerForMember]);
 
   const addMember = useCallback(async (m: Omit<FamilyMember, 'id' | 'ownerId'>) => {
     if (!user) return;
