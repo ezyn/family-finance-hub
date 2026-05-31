@@ -52,7 +52,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     const fetchAll = async () => {
       setLoading(true);
       const [expRes, memRes, catRes, budRes, recRes] = await Promise.all([
-        supabase.from('expenses').select('*').order('created_at', { ascending: false }),
+        supabase.from('expenses').select('*').is('deleted_at', null).order('created_at', { ascending: false }),
         supabase.from('family_members').select('*').order('created_at', { ascending: true }),
         supabase.from('categories').select('*').order('created_at', { ascending: true }),
         supabase.from('budgets').select('*'),
