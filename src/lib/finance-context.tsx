@@ -253,8 +253,47 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
 
-  useEffect(() => {
-    if (loading || recurring.length === 0) return;
+  const fetchDeletedExpenses = useCallback(async (): Promise<Expense[]> => {
+    const { data } = await supabase.from('expenses').select('*')
+      .not('deleted_at', 'is', null).order('deleted_at', { ascending: false });
+    return (data || []).map(mapExpense);
+  }, []);
+
+  const restoreExpense = useCallback(async (id: string) => {
+    const { data, error } = await supabase.from('expenses')
+      .update({ deleted_at: null }).eq('id', id).select().single();
+    if (data && !error) {
+      const exp = mapExpense(data);
+      setExpenses(prev => [exp, ...prev.filter(x => x.id !== id)]);
+      logAction('restore', 'expense', `Restaurou "${exp.name}" (R$ ${exp.amount.toFixed(2)})`, ownerForMember(exp.memberId));
+    }
+  }, [logAction, ownerForMember]);
+
+  const permanentlyDeleteExpense = useCallback(async (id: string) => {
+    await supabase.from('expenses').delete().eq('id', id);
+  }, []);
+
+  const fetchLogs = useCallback(async (): Promise<ChangeLog[]> => {
+    const { data } = await supabase.from('change_logs').select('*')
+      .order('created_at', { ascending: false }).limit(200);
+    return (data || []).map(mapLog);
+  }, []);
+
+  const exportBackup = useCallback(() => {
+    const backup = {
+      exportedAt: new Date().toISOString(),
+      members, categories, expenses, budgets, recurring,
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `family-finance-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [members, categories, expenses, budgets, recurring]);
+
+
     const now = new Date();
     const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const generate = async () => {
