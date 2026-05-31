@@ -360,6 +360,7 @@ function mapExpense(row: any): Expense {
     memberId: row.member_id,
     note: row.note || undefined,
     receiptUrl: row.receipt_url || undefined,
+    deletedAt: row.deleted_at || undefined,
   };
 }
 
