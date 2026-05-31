@@ -62,6 +62,39 @@ export type Database = {
         }
         Relationships: []
       }
+      change_logs: {
+        Row: {
+          action: string
+          actor_id: string
+          actor_name: string
+          created_at: string
+          entity: string
+          id: string
+          owner_id: string
+          summary: string
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          actor_name: string
+          created_at?: string
+          entity: string
+          id?: string
+          owner_id: string
+          summary: string
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          actor_name?: string
+          created_at?: string
+          entity?: string
+          id?: string
+          owner_id?: string
+          summary?: string
+        }
+        Relationships: []
+      }
       expense_comments: {
         Row: {
           author_id: string
@@ -95,6 +128,7 @@ export type Database = {
           category: string
           created_at: string
           date: string
+          deleted_at: string | null
           id: string
           member_id: string
           name: string
@@ -107,6 +141,7 @@ export type Database = {
           category: string
           created_at?: string
           date?: string
+          deleted_at?: string | null
           id?: string
           member_id: string
           name: string
@@ -119,6 +154,7 @@ export type Database = {
           category?: string
           created_at?: string
           date?: string
+          deleted_at?: string | null
           id?: string
           member_id?: string
           name?: string
