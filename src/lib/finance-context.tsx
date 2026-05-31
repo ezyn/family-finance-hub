@@ -293,7 +293,8 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     URL.revokeObjectURL(url);
   }, [members, categories, expenses, budgets, recurring]);
 
-
+  useEffect(() => {
+    if (loading || recurring.length === 0) return;
     const now = new Date();
     const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const generate = async () => {
