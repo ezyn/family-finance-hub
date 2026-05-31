@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Expense, FamilyMember, Category, Budget, RecurringExpense, ExpenseComment, DEFAULT_CATEGORIES } from './types';
+import { Expense, FamilyMember, Category, Budget, RecurringExpense, ExpenseComment, ChangeLog, DEFAULT_CATEGORIES } from './types';
 import type { PaymentMethod } from './types';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -29,6 +29,11 @@ interface FinanceContextType {
   fetchComments: (expenseId: string) => Promise<ExpenseComment[]>;
   addComment: (expenseId: string, content: string) => Promise<ExpenseComment | null>;
   deleteComment: (id: string) => Promise<void>;
+  fetchDeletedExpenses: () => Promise<Expense[]>;
+  restoreExpense: (id: string) => Promise<void>;
+  permanentlyDeleteExpense: (id: string) => Promise<void>;
+  fetchLogs: () => Promise<ChangeLog[]>;
+  exportBackup: () => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | null>(null);
@@ -47,7 +52,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     const fetchAll = async () => {
       setLoading(true);
       const [expRes, memRes, catRes, budRes, recRes] = await Promise.all([
-        supabase.from('expenses').select('*').order('created_at', { ascending: false }),
+        supabase.from('expenses').select('*').is('deleted_at', null).order('created_at', { ascending: false }),
         supabase.from('family_members').select('*').order('created_at', { ascending: true }),
         supabase.from('categories').select('*').order('created_at', { ascending: true }),
         supabase.from('budgets').select('*'),
@@ -64,6 +69,20 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   }, [user]);
 
 
+  const logAction = useCallback(async (
+    action: ChangeLog['action'], entity: string, summary: string, ownerId?: string,
+  ) => {
+    if (!user) return;
+    const owner = ownerId || user.id;
+    const authorName = members.find(m => m.email === user.email)?.name || user.email?.split('@')[0] || 'Membro';
+    await supabase.from('change_logs').insert({
+      owner_id: owner, actor_id: user.id, actor_name: authorName, action, entity, summary,
+    });
+  }, [user, members]);
+
+  const ownerForMember = useCallback((memberId: string) =>
+    members.find(m => m.id === memberId)?.ownerId, [members]);
+
   const addExpense = useCallback(async (e: Omit<Expense, 'id'>) => {
     const { data, error } = await supabase.from('expenses').insert({
       name: e.name,
@@ -74,8 +93,11 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       member_id: e.memberId,
       note: e.note || null,
     }).select().single();
-    if (data && !error) setExpenses(prev => [mapExpense(data), ...prev]);
-  }, []);
+    if (data && !error) {
+      setExpenses(prev => [mapExpense(data), ...prev]);
+      logAction('create', 'expense', `Adicionou "${e.name}" (R$ ${e.amount.toFixed(2)})`, ownerForMember(e.memberId));
+    }
+  }, [logAction, ownerForMember]);
 
   const updateExpense = useCallback(async (e: Expense) => {
     const { data, error } = await supabase.from('expenses').update({
@@ -87,13 +109,21 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       member_id: e.memberId,
       note: e.note || null,
     }).eq('id', e.id).select().single();
-    if (data && !error) setExpenses(prev => prev.map(x => x.id === e.id ? mapExpense(data) : x));
-  }, []);
+    if (data && !error) {
+      setExpenses(prev => prev.map(x => x.id === e.id ? mapExpense(data) : x));
+      logAction('update', 'expense', `Editou "${e.name}" (R$ ${e.amount.toFixed(2)})`, ownerForMember(e.memberId));
+    }
+  }, [logAction, ownerForMember]);
 
   const deleteExpense = useCallback(async (id: string) => {
-    const { error } = await supabase.from('expenses').delete().eq('id', id);
-    if (!error) setExpenses(prev => prev.filter(x => x.id !== id));
-  }, []);
+    const exp = expenses.find(x => x.id === id);
+    const { error } = await supabase.from('expenses').update({ deleted_at: new Date().toISOString() }).eq('id', id);
+    if (!error) {
+      setExpenses(prev => prev.filter(x => x.id !== id));
+      if (exp) logAction('delete', 'expense', `Excluiu "${exp.name}" (R$ ${exp.amount.toFixed(2)})`, ownerForMember(exp.memberId));
+    }
+
+  }, [expenses, logAction, ownerForMember]);
 
   const addMember = useCallback(async (m: Omit<FamilyMember, 'id' | 'ownerId'>) => {
     if (!user) return;
@@ -223,6 +253,46 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
 
+  const fetchDeletedExpenses = useCallback(async (): Promise<Expense[]> => {
+    const { data } = await supabase.from('expenses').select('*')
+      .not('deleted_at', 'is', null).order('deleted_at', { ascending: false });
+    return (data || []).map(mapExpense);
+  }, []);
+
+  const restoreExpense = useCallback(async (id: string) => {
+    const { data, error } = await supabase.from('expenses')
+      .update({ deleted_at: null }).eq('id', id).select().single();
+    if (data && !error) {
+      const exp = mapExpense(data);
+      setExpenses(prev => [exp, ...prev.filter(x => x.id !== id)]);
+      logAction('restore', 'expense', `Restaurou "${exp.name}" (R$ ${exp.amount.toFixed(2)})`, ownerForMember(exp.memberId));
+    }
+  }, [logAction, ownerForMember]);
+
+  const permanentlyDeleteExpense = useCallback(async (id: string) => {
+    await supabase.from('expenses').delete().eq('id', id);
+  }, []);
+
+  const fetchLogs = useCallback(async (): Promise<ChangeLog[]> => {
+    const { data } = await supabase.from('change_logs').select('*')
+      .order('created_at', { ascending: false }).limit(200);
+    return (data || []).map(mapLog);
+  }, []);
+
+  const exportBackup = useCallback(() => {
+    const backup = {
+      exportedAt: new Date().toISOString(),
+      members, categories, expenses, budgets, recurring,
+    };
+    const blob = new Blob([JSON.stringify(backup, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `family-finance-backup-${new Date().toISOString().slice(0, 10)}.json`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }, [members, categories, expenses, budgets, recurring]);
+
   useEffect(() => {
     if (loading || recurring.length === 0) return;
     const now = new Date();
@@ -265,6 +335,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       setBudget, deleteBudget,
       addRecurring, updateRecurring, deleteRecurring,
       uploadReceipt, removeReceipt, fetchComments, addComment, deleteComment,
+      fetchDeletedExpenses, restoreExpense, permanentlyDeleteExpense, fetchLogs, exportBackup,
     }}>
       {children}
     </FinanceContext.Provider>
@@ -289,6 +360,7 @@ function mapExpense(row: any): Expense {
     memberId: row.member_id,
     note: row.note || undefined,
     receiptUrl: row.receipt_url || undefined,
+    deletedAt: row.deleted_at || undefined,
   };
 }
 
@@ -335,6 +407,19 @@ function mapComment(row: any): ExpenseComment {
     authorId: row.author_id,
     authorName: row.author_name,
     content: row.content,
+    createdAt: row.created_at,
+  };
+}
+
+function mapLog(row: any): ChangeLog {
+  return {
+    id: row.id,
+    ownerId: row.owner_id,
+    actorId: row.actor_id,
+    actorName: row.author_name ?? row.actor_name,
+    action: row.action,
+    entity: row.entity,
+    summary: row.summary,
     createdAt: row.created_at,
   };
 }
