@@ -48,7 +48,7 @@ function AuthenticatedApp() {
                 <ThemeToggle />
               </div>
             </header>
-            <main className="flex-1 p-4 md:p-6 overflow-auto">
+            <main className="flex-1 p-4 md:p-6 overflow-auto pb-20 md:pb-6">
               <Routes>
                 <Route path="/" element={<Dashboard />} />
                 <Route path="/despesas" element={<Expenses />} />
@@ -56,11 +56,13 @@ function AuthenticatedApp() {
                 <Route path="/relatorios" element={<Reports />} />
                 <Route path="/membros" element={<Members />} />
                 <Route path="/configuracoes" element={<Settings />} />
+                <Route path="/dados" element={<Data />} />
                 <Route path="/auth" element={<Navigate to="/" replace />} />
                 <Route path="*" element={<NotFound />} />
               </Routes>
             </main>
           </div>
+          <BottomNav />
         </div>
       </SidebarProvider>
     </FinanceProvider>
