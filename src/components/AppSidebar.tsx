@@ -1,4 +1,4 @@
-import { LayoutDashboard, Receipt, Users, Settings, Wallet, Target, BarChart3 } from 'lucide-react';
+import { LayoutDashboard, Receipt, Users, Settings, Wallet, Target, BarChart3, ShieldCheck } from 'lucide-react';
 import { NavLink } from '@/components/NavLink';
 import {
   Sidebar,
@@ -17,6 +17,7 @@ const items = [
   { title: 'Planejamento', url: '/planejamento', icon: Target },
   { title: 'Relatórios', url: '/relatorios', icon: BarChart3 },
   { title: 'Membros', url: '/membros', icon: Users },
+  { title: 'Segurança & Dados', url: '/dados', icon: ShieldCheck },
   { title: 'Configurações', url: '/configuracoes', icon: Settings },
 ];
 
