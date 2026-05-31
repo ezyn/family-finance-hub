@@ -26,6 +26,18 @@ export interface Expense {
   memberId: string;
   note?: string;
   receiptUrl?: string;
+  deletedAt?: string;
+}
+
+export interface ChangeLog {
+  id: string;
+  ownerId: string;
+  actorId: string;
+  actorName: string;
+  action: 'create' | 'update' | 'delete' | 'restore';
+  entity: string;
+  summary: string;
+  createdAt: string;
 }
 
 export interface ExpenseComment {
