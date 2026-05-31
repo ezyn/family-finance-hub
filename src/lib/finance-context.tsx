@@ -29,6 +29,11 @@ interface FinanceContextType {
   fetchComments: (expenseId: string) => Promise<ExpenseComment[]>;
   addComment: (expenseId: string, content: string) => Promise<ExpenseComment | null>;
   deleteComment: (id: string) => Promise<void>;
+  fetchDeletedExpenses: () => Promise<Expense[]>;
+  restoreExpense: (id: string) => Promise<void>;
+  permanentlyDeleteExpense: (id: string) => Promise<void>;
+  fetchLogs: () => Promise<ChangeLog[]>;
+  exportBackup: () => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | null>(null);
