@@ -49,6 +49,19 @@ export interface ExpenseComment {
   createdAt: string;
 }
 
+export interface Challenge {
+  id: string;
+  ownerId?: string;
+  title: string;
+  description?: string;
+  category?: string;
+  targetAmount: number;
+  startDate: string;
+  endDate: string;
+  completed: boolean;
+  createdAt?: string;
+}
+
 export interface Category {
   id: string;
   name: string;

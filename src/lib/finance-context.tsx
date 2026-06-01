@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Expense, FamilyMember, Category, Budget, RecurringExpense, ExpenseComment, ChangeLog, DEFAULT_CATEGORIES } from './types';
+import { Expense, FamilyMember, Category, Budget, RecurringExpense, ExpenseComment, ChangeLog, Challenge, DEFAULT_CATEGORIES } from './types';
 import type { PaymentMethod } from './types';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -10,6 +10,7 @@ interface FinanceContextType {
   categories: Category[];
   budgets: Budget[];
   recurring: RecurringExpense[];
+  challenges: Challenge[];
   loading: boolean;
   addExpense: (e: Omit<Expense, 'id'>) => void;
   updateExpense: (e: Expense) => void;
@@ -34,6 +35,9 @@ interface FinanceContextType {
   permanentlyDeleteExpense: (id: string) => Promise<void>;
   fetchLogs: () => Promise<ChangeLog[]>;
   exportBackup: () => void;
+  addChallenge: (c: Omit<Challenge, 'id' | 'ownerId' | 'completed' | 'createdAt'>) => void;
+  updateChallenge: (c: Challenge) => void;
+  deleteChallenge: (id: string) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | null>(null);
@@ -45,24 +49,27 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [recurring, setRecurring] = useState<RecurringExpense[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     const fetchAll = async () => {
       setLoading(true);
-      const [expRes, memRes, catRes, budRes, recRes] = await Promise.all([
+      const [expRes, memRes, catRes, budRes, recRes, chRes] = await Promise.all([
         supabase.from('expenses').select('*').is('deleted_at', null).order('created_at', { ascending: false }),
         supabase.from('family_members').select('*').order('created_at', { ascending: true }),
         supabase.from('categories').select('*').order('created_at', { ascending: true }),
         supabase.from('budgets').select('*'),
         supabase.from('recurring_expenses').select('*').order('created_at', { ascending: true }),
+        supabase.from('challenges').select('*').order('created_at', { ascending: false }),
       ]);
       if (expRes.data) setExpenses(expRes.data.map(mapExpense));
       if (memRes.data) setMembers(memRes.data.map(mapMember));
       if (catRes.data && catRes.data.length > 0) setCategories(catRes.data);
       if (budRes.data) setBudgets(budRes.data.map(mapBudget));
       if (recRes.data) setRecurring(recRes.data.map(mapRecurring));
+      if (chRes.data) setChallenges(chRes.data.map(mapChallenge));
       setLoading(false);
     };
     fetchAll();
@@ -293,6 +300,41 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     URL.revokeObjectURL(url);
   }, [members, categories, expenses, budgets, recurring]);
 
+  const addChallenge = useCallback(async (c: Omit<Challenge, 'id' | 'ownerId' | 'completed' | 'createdAt'>) => {
+    if (!user) return;
+    const { data, error } = await supabase.from('challenges').insert({
+      owner_id: user.id,
+      title: c.title,
+      description: c.description || null,
+      category: c.category || null,
+      target_amount: c.targetAmount,
+      start_date: c.startDate,
+      end_date: c.endDate,
+    }).select().single();
+    if (data && !error) {
+      setChallenges(prev => [mapChallenge(data), ...prev]);
+      logAction('create', 'challenge', `Criou o desafio "${c.title}"`, user.id);
+    }
+  }, [user, logAction]);
+
+  const updateChallenge = useCallback(async (c: Challenge) => {
+    const { data, error } = await supabase.from('challenges').update({
+      title: c.title,
+      description: c.description || null,
+      category: c.category || null,
+      target_amount: c.targetAmount,
+      start_date: c.startDate,
+      end_date: c.endDate,
+      completed: c.completed,
+    }).eq('id', c.id).select().single();
+    if (data && !error) setChallenges(prev => prev.map(x => x.id === c.id ? mapChallenge(data) : x));
+  }, []);
+
+  const deleteChallenge = useCallback(async (id: string) => {
+    const { error } = await supabase.from('challenges').delete().eq('id', id);
+    if (!error) setChallenges(prev => prev.filter(x => x.id !== id));
+  }, []);
+
   useEffect(() => {
     if (loading || recurring.length === 0) return;
     const now = new Date();
@@ -328,7 +370,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <FinanceContext.Provider value={{
-      expenses, members, categories, budgets, recurring, loading,
+      expenses, members, categories, budgets, recurring, challenges, loading,
       addExpense, updateExpense, deleteExpense,
       addMember, updateMember, deleteMember,
       addCategory, deleteCategory,
@@ -336,6 +378,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       addRecurring, updateRecurring, deleteRecurring,
       uploadReceipt, removeReceipt, fetchComments, addComment, deleteComment,
       fetchDeletedExpenses, restoreExpense, permanentlyDeleteExpense, fetchLogs, exportBackup,
+      addChallenge, updateChallenge, deleteChallenge,
     }}>
       {children}
     </FinanceContext.Provider>
@@ -420,6 +463,21 @@ function mapLog(row: any): ChangeLog {
     action: row.action,
     entity: row.entity,
     summary: row.summary,
+    createdAt: row.created_at,
+  };
+}
+
+function mapChallenge(row: any): Challenge {
+  return {
+    id: row.id,
+    ownerId: row.owner_id,
+    title: row.title,
+    description: row.description || undefined,
+    category: row.category || undefined,
+    targetAmount: Number(row.target_amount),
+    startDate: row.start_date,
+    endDate: row.end_date,
+    completed: row.completed,
     createdAt: row.created_at,
   };
 }
