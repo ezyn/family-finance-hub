@@ -16,6 +16,7 @@ import Planning from "./pages/Planning";
 import Reports from "./pages/Reports";
 import Settings from "./pages/Settings";
 import Data from "./pages/Data";
+import Gamification from "./pages/Gamification";
 import Auth from "./pages/Auth";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
@@ -54,6 +55,7 @@ function AuthenticatedApp() {
                 <Route path="/despesas" element={<Expenses />} />
                 <Route path="/planejamento" element={<Planning />} />
                 <Route path="/relatorios" element={<Reports />} />
+                <Route path="/conquistas" element={<Gamification />} />
                 <Route path="/membros" element={<Members />} />
                 <Route path="/configuracoes" element={<Settings />} />
                 <Route path="/dados" element={<Data />} />
