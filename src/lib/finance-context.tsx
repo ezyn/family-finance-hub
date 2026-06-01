@@ -49,24 +49,27 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
   const [categories, setCategories] = useState<Category[]>(DEFAULT_CATEGORIES);
   const [budgets, setBudgets] = useState<Budget[]>([]);
   const [recurring, setRecurring] = useState<RecurringExpense[]>([]);
+  const [challenges, setChallenges] = useState<Challenge[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     if (!user) return;
     const fetchAll = async () => {
       setLoading(true);
-      const [expRes, memRes, catRes, budRes, recRes] = await Promise.all([
+      const [expRes, memRes, catRes, budRes, recRes, chRes] = await Promise.all([
         supabase.from('expenses').select('*').is('deleted_at', null).order('created_at', { ascending: false }),
         supabase.from('family_members').select('*').order('created_at', { ascending: true }),
         supabase.from('categories').select('*').order('created_at', { ascending: true }),
         supabase.from('budgets').select('*'),
         supabase.from('recurring_expenses').select('*').order('created_at', { ascending: true }),
+        supabase.from('challenges').select('*').order('created_at', { ascending: false }),
       ]);
       if (expRes.data) setExpenses(expRes.data.map(mapExpense));
       if (memRes.data) setMembers(memRes.data.map(mapMember));
       if (catRes.data && catRes.data.length > 0) setCategories(catRes.data);
       if (budRes.data) setBudgets(budRes.data.map(mapBudget));
       if (recRes.data) setRecurring(recRes.data.map(mapRecurring));
+      if (chRes.data) setChallenges(chRes.data.map(mapChallenge));
       setLoading(false);
     };
     fetchAll();
