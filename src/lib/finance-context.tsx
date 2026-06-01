@@ -466,3 +466,18 @@ function mapLog(row: any): ChangeLog {
     createdAt: row.created_at,
   };
 }
+
+function mapChallenge(row: any): Challenge {
+  return {
+    id: row.id,
+    ownerId: row.owner_id,
+    title: row.title,
+    description: row.description || undefined,
+    category: row.category || undefined,
+    targetAmount: Number(row.target_amount),
+    startDate: row.start_date,
+    endDate: row.end_date,
+    completed: row.completed,
+    createdAt: row.created_at,
+  };
+}
