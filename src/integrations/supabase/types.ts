@@ -62,6 +62,45 @@ export type Database = {
         }
         Relationships: []
       }
+      challenges: {
+        Row: {
+          category: string | null
+          completed: boolean
+          created_at: string
+          description: string | null
+          end_date: string
+          id: string
+          owner_id: string
+          start_date: string
+          target_amount: number
+          title: string
+        }
+        Insert: {
+          category?: string | null
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          end_date: string
+          id?: string
+          owner_id: string
+          start_date?: string
+          target_amount?: number
+          title: string
+        }
+        Update: {
+          category?: string | null
+          completed?: boolean
+          created_at?: string
+          description?: string | null
+          end_date?: string
+          id?: string
+          owner_id?: string
+          start_date?: string
+          target_amount?: number
+          title?: string
+        }
+        Relationships: []
+      }
       change_logs: {
         Row: {
           action: string
