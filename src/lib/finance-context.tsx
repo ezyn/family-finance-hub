@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { supabase } from '@/integrations/supabase/client';
-import { Expense, FamilyMember, Category, Budget, RecurringExpense, ExpenseComment, ChangeLog, DEFAULT_CATEGORIES } from './types';
+import { Expense, FamilyMember, Category, Budget, RecurringExpense, ExpenseComment, ChangeLog, Challenge, DEFAULT_CATEGORIES } from './types';
 import type { PaymentMethod } from './types';
 import { useAuth } from '@/hooks/useAuth';
 
@@ -10,6 +10,7 @@ interface FinanceContextType {
   categories: Category[];
   budgets: Budget[];
   recurring: RecurringExpense[];
+  challenges: Challenge[];
   loading: boolean;
   addExpense: (e: Omit<Expense, 'id'>) => void;
   updateExpense: (e: Expense) => void;
@@ -34,6 +35,9 @@ interface FinanceContextType {
   permanentlyDeleteExpense: (id: string) => Promise<void>;
   fetchLogs: () => Promise<ChangeLog[]>;
   exportBackup: () => void;
+  addChallenge: (c: Omit<Challenge, 'id' | 'ownerId' | 'completed' | 'createdAt'>) => void;
+  updateChallenge: (c: Challenge) => void;
+  deleteChallenge: (id: string) => void;
 }
 
 const FinanceContext = createContext<FinanceContextType | null>(null);
