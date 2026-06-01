@@ -300,6 +300,41 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
     URL.revokeObjectURL(url);
   }, [members, categories, expenses, budgets, recurring]);
 
+  const addChallenge = useCallback(async (c: Omit<Challenge, 'id' | 'ownerId' | 'completed' | 'createdAt'>) => {
+    if (!user) return;
+    const { data, error } = await supabase.from('challenges').insert({
+      owner_id: user.id,
+      title: c.title,
+      description: c.description || null,
+      category: c.category || null,
+      target_amount: c.targetAmount,
+      start_date: c.startDate,
+      end_date: c.endDate,
+    }).select().single();
+    if (data && !error) {
+      setChallenges(prev => [mapChallenge(data), ...prev]);
+      logAction('create', 'challenge', `Criou o desafio "${c.title}"`, user.id);
+    }
+  }, [user, logAction]);
+
+  const updateChallenge = useCallback(async (c: Challenge) => {
+    const { data, error } = await supabase.from('challenges').update({
+      title: c.title,
+      description: c.description || null,
+      category: c.category || null,
+      target_amount: c.targetAmount,
+      start_date: c.startDate,
+      end_date: c.endDate,
+      completed: c.completed,
+    }).eq('id', c.id).select().single();
+    if (data && !error) setChallenges(prev => prev.map(x => x.id === c.id ? mapChallenge(data) : x));
+  }, []);
+
+  const deleteChallenge = useCallback(async (id: string) => {
+    const { error } = await supabase.from('challenges').delete().eq('id', id);
+    if (!error) setChallenges(prev => prev.filter(x => x.id !== id));
+  }, []);
+
   useEffect(() => {
     if (loading || recurring.length === 0) return;
     const now = new Date();
@@ -335,7 +370,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
 
   return (
     <FinanceContext.Provider value={{
-      expenses, members, categories, budgets, recurring, loading,
+      expenses, members, categories, budgets, recurring, challenges, loading,
       addExpense, updateExpense, deleteExpense,
       addMember, updateMember, deleteMember,
       addCategory, deleteCategory,
@@ -343,6 +378,7 @@ export function FinanceProvider({ children }: { children: React.ReactNode }) {
       addRecurring, updateRecurring, deleteRecurring,
       uploadReceipt, removeReceipt, fetchComments, addComment, deleteComment,
       fetchDeletedExpenses, restoreExpense, permanentlyDeleteExpense, fetchLogs, exportBackup,
+      addChallenge, updateChallenge, deleteChallenge,
     }}>
       {children}
     </FinanceContext.Provider>
