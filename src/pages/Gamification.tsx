@@ -66,8 +66,6 @@ const Gamification = () => {
 
   // ---- Achievements (computed from data) ----
   const achievements = useMemo(() => {
-    const now = new Date();
-    const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const thisMonth = expenses.filter(e => e.date.slice(0, 7) === monthKey);
     const withReceipt = expenses.filter(e => e.receiptUrl).length;
     const completedChallenges = challenges.filter(c => c.completed).length;
