@@ -22,6 +22,7 @@ import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import { InstallPWA } from "./components/InstallPWA";
 import { BottomNav } from "./components/BottomNav";
+import { BudgetAlertWatcher } from "./components/BudgetAlertWatcher";
 
 const queryClient = new QueryClient();
 
