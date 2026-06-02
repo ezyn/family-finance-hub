@@ -50,7 +50,7 @@ export function MonthlySummary() {
 
     return { cur, curTotal, prevTotal, diff, diffPct, topCat, topMember, biggest, count: cur.length };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expenses, categories, members]);
+  }, [expenses, categories, members, monthKey]);
 
   const monthLabel = format(now, 'MMMM yyyy', { locale: ptBR });
 
