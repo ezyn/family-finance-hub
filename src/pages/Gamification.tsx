@@ -25,6 +25,7 @@ const Gamification = () => {
   const { challenges, expenses, categories, addChallenge, updateChallenge, deleteChallenge } = useFinance();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', category: '', targetAmount: '', endDate: '' });
+  const monthKey = useCurrentMonth();
 
   const spentForChallenge = (c: Challenge) =>
     expenses
