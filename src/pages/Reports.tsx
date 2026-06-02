@@ -12,6 +12,7 @@ import { ptBR } from 'date-fns/locale';
 import jsPDF from 'jspdf';
 import autoTable from 'jspdf-autotable';
 import { toast } from 'sonner';
+import { MonthlySummary } from '@/components/MonthlySummary';
 
 const brl = (v: number) => `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigits: 2 })}`;
 
@@ -97,6 +98,8 @@ const Reports = () => {
         </div>
         <Button onClick={exportPDF} className="gap-1.5"><Download className="h-4 w-4" /> Exportar PDF</Button>
       </div>
+
+      <MonthlySummary />
 
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[

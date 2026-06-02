@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react';
+import { useEffect, useMemo, useRef, useState } from 'react';
 import { useFinance } from '@/lib/finance-context';
 import { Challenge } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -29,6 +29,37 @@ const Gamification = () => {
     expenses
       .filter(e => (!c.category || e.category === c.category) && e.date >= c.startDate && e.date <= c.endDate)
       .reduce((s, e) => s + e.amount, 0);
+
+  const today = new Date().toISOString().slice(0, 10);
+
+  // ---- Regras de conclusão do desafio ----
+  // Um desafio é "conquistado" quando termina dentro do limite de gasto definido,
+  // e "não atingido" quando o gasto ultrapassa o limite.
+  const statusOf = (c: Challenge): 'won' | 'failed' | 'active' => {
+    if (c.targetAmount <= 0) return c.completed ? 'won' : 'active';
+    const spent = spentForChallenge(c);
+    if (spent > c.targetAmount) return 'failed';
+    if (c.endDate < today) return 'won';
+    return c.completed ? 'won' : 'active';
+  };
+
+  // Marca automaticamente como concluído quando o desafio é conquistado pela regra
+  const awarded = useRef(false);
+  useEffect(() => {
+    if (awarded.current) return;
+    const toWin = challenges.filter(c => !c.completed && statusOf(c) === 'won');
+    if (toWin.length > 0) {
+      awarded.current = true;
+      toWin.forEach(c => {
+        updateChallenge({ ...c, completed: true });
+        toast.success(`Conquista desbloqueada: "${c.title}" 🏆`, {
+          description: 'Desafio concluído dentro do limite definido!',
+        });
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [challenges, expenses]);
+
 
   // ---- Achievements (computed from data) ----
   const achievements = useMemo(() => {
@@ -177,6 +208,9 @@ const Gamification = () => {
       <Card className="border-none shadow-sm">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2"><Target className="h-4 w-4 text-primary" /> Desafios da Família</CardTitle>
+          <p className="text-xs text-muted-foreground mt-1">
+            Regra: mantenha o gasto dentro do limite até a data final para conquistar o desafio e desbloquear uma conquista. Ultrapassar o limite marca como "não atingido".
+          </p>
         </CardHeader>
         <CardContent className="space-y-3">
           {challenges.length === 0 && (
@@ -186,14 +220,17 @@ const Gamification = () => {
             const spent = spentForChallenge(c);
             const pct = c.targetAmount > 0 ? (spent / c.targetAmount) * 100 : 0;
             const overBudget = c.targetAmount > 0 && spent > c.targetAmount;
+            const status = statusOf(c);
             return (
-              <div key={c.id} className={`rounded-xl border p-4 ${c.completed ? 'bg-primary/5 border-primary/30' : 'bg-muted/30'}`}>
+              <div key={c.id} className={`rounded-xl border p-4 ${status === 'won' ? 'bg-primary/5 border-primary/30' : status === 'failed' ? 'bg-destructive/5 border-destructive/30' : 'bg-muted/30'}`}>
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-semibold">{c.title}</p>
                       {c.category && <Badge variant="outline" className="text-[10px]">{c.category}</Badge>}
-                      {c.completed && <Badge className="text-[10px] gap-1"><CheckCircle2 className="h-3 w-3" /> Concluído</Badge>}
+                      {status === 'won' && <Badge className="text-[10px] gap-1"><CheckCircle2 className="h-3 w-3" /> Conquistado</Badge>}
+                      {status === 'failed' && <Badge variant="destructive" className="text-[10px]">Não atingido</Badge>}
+                      {status === 'active' && <Badge variant="secondary" className="text-[10px]">Em andamento</Badge>}
                     </div>
                     {c.description && <p className="text-xs text-muted-foreground mt-1">{c.description}</p>}
                     <p className="text-[11px] text-muted-foreground mt-1">Até {new Date(c.endDate + 'T00:00:00').toLocaleDateString('pt-BR')}</p>

@@ -22,6 +22,7 @@ import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
 import { InstallPWA } from "./components/InstallPWA";
 import { BottomNav } from "./components/BottomNav";
+import { BudgetAlertWatcher } from "./components/BudgetAlertWatcher";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ function AuthenticatedApp() {
 
   return (
     <FinanceProvider>
+      <BudgetAlertWatcher />
       <SidebarProvider>
         <div className="min-h-screen flex w-full bg-gradient-to-br from-primary/5 via-background to-accent/5 dark:from-[hsl(270,40%,8%)] dark:via-[hsl(275,35%,12%)] dark:to-[hsl(265,30%,10%)]">
           <AppSidebar />
