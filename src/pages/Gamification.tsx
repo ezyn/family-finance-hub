@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCurrentMonth } from '@/hooks/useCurrentMonth';
 import { useFinance } from '@/lib/finance-context';
 import { Challenge } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
