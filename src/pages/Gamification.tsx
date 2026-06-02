@@ -97,7 +97,7 @@ const Gamification = () => {
         unlocked: completedChallenges >= 3, progress: Math.min(completedChallenges, 3), goal: 3,
       },
     ];
-  }, [expenses, challenges]);
+  }, [expenses, challenges, monthKey]);
 
   const unlockedCount = achievements.filter(a => a.unlocked).length;
 
