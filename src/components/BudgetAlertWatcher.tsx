@@ -59,7 +59,7 @@ export function BudgetAlertWatcher() {
         });
       }
     }
-  }, [budgets, categories, expenses, loading]);
+  }, [budgets, categories, expenses, loading, monthKey]);
 
   return null;
 }
