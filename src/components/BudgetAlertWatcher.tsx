@@ -11,6 +11,7 @@ import { toast } from 'sonner';
  */
 export function BudgetAlertWatcher() {
   const { budgets, categories, expenses, loading } = useFinance();
+  const monthKey = useCurrentMonth();
   const ready = useRef(false);
 
   useEffect(() => {
