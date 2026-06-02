@@ -45,22 +45,23 @@ const Gamification = () => {
     return c.completed ? 'won' : 'active';
   };
 
-  // Marca automaticamente como concluído quando o desafio é conquistado pela regra
-  const awarded = useRef(false);
+  // Reavalia os desafios automaticamente quando o mês muda ou novas despesas
+  // são registradas, marcando cada conquista uma única vez.
+  const awardedIds = useRef<Set<string>>(new Set());
   useEffect(() => {
-    if (awarded.current) return;
-    const toWin = challenges.filter(c => !c.completed && statusOf(c) === 'won');
-    if (toWin.length > 0) {
-      awarded.current = true;
-      toWin.forEach(c => {
-        updateChallenge({ ...c, completed: true });
-        toast.success(`Conquista desbloqueada: "${c.title}" 🏆`, {
-          description: 'Desafio concluído dentro do limite definido!',
-        });
+    challenges.forEach(c => {
+      if (c.completed) return;
+      if (statusOf(c) !== 'won') return;
+      if (awardedIds.current.has(c.id)) return;
+      awardedIds.current.add(c.id);
+      updateChallenge({ ...c, completed: true });
+      toast.success(`Conquista desbloqueada: "${c.title}" 🏆`, {
+        description: 'Desafio concluído dentro do limite definido!',
       });
-    }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [challenges, expenses]);
+  }, [challenges, expenses, monthKey]);
+
 
 
   // ---- Achievements (computed from data) ----
