@@ -208,6 +208,9 @@ const Gamification = () => {
       <Card className="border-none shadow-sm">
         <CardHeader>
           <CardTitle className="text-base flex items-center gap-2"><Target className="h-4 w-4 text-primary" /> Desafios da Família</CardTitle>
+          <p className="text-xs text-muted-foreground mt-1">
+            Regra: mantenha o gasto dentro do limite até a data final para conquistar o desafio e desbloquear uma conquista. Ultrapassar o limite marca como "não atingido".
+          </p>
         </CardHeader>
         <CardContent className="space-y-3">
           {challenges.length === 0 && (
