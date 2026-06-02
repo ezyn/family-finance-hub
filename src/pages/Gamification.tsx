@@ -30,6 +30,37 @@ const Gamification = () => {
       .filter(e => (!c.category || e.category === c.category) && e.date >= c.startDate && e.date <= c.endDate)
       .reduce((s, e) => s + e.amount, 0);
 
+  const today = new Date().toISOString().slice(0, 10);
+
+  // ---- Regras de conclusão do desafio ----
+  // Um desafio é "conquistado" quando termina dentro do limite de gasto definido,
+  // e "não atingido" quando o gasto ultrapassa o limite.
+  const statusOf = (c: Challenge): 'won' | 'failed' | 'active' => {
+    if (c.targetAmount <= 0) return c.completed ? 'won' : 'active';
+    const spent = spentForChallenge(c);
+    if (spent > c.targetAmount) return 'failed';
+    if (c.endDate < today) return 'won';
+    return c.completed ? 'won' : 'active';
+  };
+
+  // Marca automaticamente como concluído quando o desafio é conquistado pela regra
+  const awarded = useRef(false);
+  useEffect(() => {
+    if (awarded.current) return;
+    const toWin = challenges.filter(c => !c.completed && statusOf(c) === 'won');
+    if (toWin.length > 0) {
+      awarded.current = true;
+      toWin.forEach(c => {
+        updateChallenge({ ...c, completed: true });
+        toast.success(`Conquista desbloqueada: "${c.title}" 🏆`, {
+          description: 'Desafio concluído dentro do limite definido!',
+        });
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [challenges, expenses]);
+
+
   // ---- Achievements (computed from data) ----
   const achievements = useMemo(() => {
     const now = new Date();
