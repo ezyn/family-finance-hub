@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useFinance } from '@/lib/finance-context';
+import { useCurrentMonth } from '@/hooks/useCurrentMonth';
 import { startOfMonth, isAfter } from 'date-fns';
 import { toast } from 'sonner';
 
@@ -10,6 +11,7 @@ import { toast } from 'sonner';
  */
 export function BudgetAlertWatcher() {
   const { budgets, categories, expenses, loading } = useFinance();
+  const monthKey = useCurrentMonth();
   const ready = useRef(false);
 
   useEffect(() => {
@@ -57,7 +59,7 @@ export function BudgetAlertWatcher() {
         });
       }
     }
-  }, [budgets, categories, expenses, loading]);
+  }, [budgets, categories, expenses, loading, monthKey]);
 
   return null;
 }

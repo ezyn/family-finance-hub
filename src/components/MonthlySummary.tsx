@@ -1,5 +1,6 @@
 import { useMemo } from 'react';
 import { useFinance } from '@/lib/finance-context';
+import { useCurrentMonth } from '@/hooks/useCurrentMonth';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Sparkles, TrendingUp, TrendingDown, Crown, Receipt, Users } from 'lucide-react';
@@ -13,6 +14,7 @@ const brl = (v: number) => `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigi
  */
 export function MonthlySummary() {
   const { expenses, categories, members } = useFinance();
+  const monthKey = useCurrentMonth();
 
   const now = new Date();
   const curStart = startOfMonth(now);
@@ -48,7 +50,7 @@ export function MonthlySummary() {
 
     return { cur, curTotal, prevTotal, diff, diffPct, topCat, topMember, biggest, count: cur.length };
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [expenses, categories, members]);
+  }, [expenses, categories, members, monthKey]);
 
   const monthLabel = format(now, 'MMMM yyyy', { locale: ptBR });
 

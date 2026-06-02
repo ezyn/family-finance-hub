@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useRef, useState } from 'react';
+import { useCurrentMonth } from '@/hooks/useCurrentMonth';
 import { useFinance } from '@/lib/finance-context';
 import { Challenge } from '@/lib/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,6 +25,7 @@ const Gamification = () => {
   const { challenges, expenses, categories, addChallenge, updateChallenge, deleteChallenge } = useFinance();
   const [open, setOpen] = useState(false);
   const [form, setForm] = useState({ title: '', description: '', category: '', targetAmount: '', endDate: '' });
+  const monthKey = useCurrentMonth();
 
   const spentForChallenge = (c: Challenge) =>
     expenses
@@ -43,28 +45,27 @@ const Gamification = () => {
     return c.completed ? 'won' : 'active';
   };
 
-  // Marca automaticamente como concluído quando o desafio é conquistado pela regra
-  const awarded = useRef(false);
+  // Reavalia os desafios automaticamente quando o mês muda ou novas despesas
+  // são registradas, marcando cada conquista uma única vez.
+  const awardedIds = useRef<Set<string>>(new Set());
   useEffect(() => {
-    if (awarded.current) return;
-    const toWin = challenges.filter(c => !c.completed && statusOf(c) === 'won');
-    if (toWin.length > 0) {
-      awarded.current = true;
-      toWin.forEach(c => {
-        updateChallenge({ ...c, completed: true });
-        toast.success(`Conquista desbloqueada: "${c.title}" 🏆`, {
-          description: 'Desafio concluído dentro do limite definido!',
-        });
+    challenges.forEach(c => {
+      if (c.completed) return;
+      if (statusOf(c) !== 'won') return;
+      if (awardedIds.current.has(c.id)) return;
+      awardedIds.current.add(c.id);
+      updateChallenge({ ...c, completed: true });
+      toast.success(`Conquista desbloqueada: "${c.title}" 🏆`, {
+        description: 'Desafio concluído dentro do limite definido!',
       });
-    }
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [challenges, expenses]);
+  }, [challenges, expenses, monthKey]);
+
 
 
   // ---- Achievements (computed from data) ----
   const achievements = useMemo(() => {
-    const now = new Date();
-    const monthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
     const thisMonth = expenses.filter(e => e.date.slice(0, 7) === monthKey);
     const withReceipt = expenses.filter(e => e.receiptUrl).length;
     const completedChallenges = challenges.filter(c => c.completed).length;
@@ -96,7 +97,7 @@ const Gamification = () => {
         unlocked: completedChallenges >= 3, progress: Math.min(completedChallenges, 3), goal: 3,
       },
     ];
-  }, [expenses, challenges]);
+  }, [expenses, challenges, monthKey]);
 
   const unlockedCount = achievements.filter(a => a.unlocked).length;
 
