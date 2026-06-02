@@ -99,6 +99,8 @@ const Reports = () => {
         <Button onClick={exportPDF} className="gap-1.5"><Download className="h-4 w-4" /> Exportar PDF</Button>
       </div>
 
+      <MonthlySummary />
+
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
         {[
           { label: 'Mês atual', value: curTotal },
