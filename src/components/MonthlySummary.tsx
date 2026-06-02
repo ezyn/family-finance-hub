@@ -14,6 +14,7 @@ const brl = (v: number) => `R$ ${v.toLocaleString('pt-BR', { minimumFractionDigi
  */
 export function MonthlySummary() {
   const { expenses, categories, members } = useFinance();
+  const monthKey = useCurrentMonth();
 
   const now = new Date();
   const curStart = startOfMonth(now);
