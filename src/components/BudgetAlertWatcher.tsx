@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { useFinance } from '@/lib/finance-context';
+import { useCurrentMonth } from '@/hooks/useCurrentMonth';
 import { startOfMonth, isAfter } from 'date-fns';
 import { toast } from 'sonner';
 
